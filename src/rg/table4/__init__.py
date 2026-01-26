@@ -4,7 +4,7 @@ __version__ = "0.1.0"
 
 from .columns import DynamicColumn
 from .tables import Table4, Table4Meta
-from .views import Table4ListView, Table4Mixin, table_render
+from .views import table_render
 from .config import RequestConfig
 
 __all__ = [
