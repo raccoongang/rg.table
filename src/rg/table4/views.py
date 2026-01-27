@@ -28,11 +28,13 @@ def table_render(
     """
     table = params['table']
     if request.headers.get('Datastar-Request') == 'true':
-        table_html = render_to_string(table._meta.template_name, {"table": table}, request)
+        # Pass all params to template (includes filterset, filter_fields, etc.)
+        table_html = render_to_string(table._meta.template_name, params, request)
 
-        # Build URL with current page number
+        # Build URL with current page number (preserves filter params from request.GET)
         query_params = request.GET.copy()
         query_params['page'] = table.page.number
+        query_params.pop('datastar', None)
         current_url = f"{request.path}?{query_params.urlencode()}"
 
         # Update browser URL with current page number using History API
@@ -41,12 +43,8 @@ def table_render(
         def table_updates() -> Generator[DatastarEvent, None, None]:
             yield ServerSentEventGenerator.execute_script(js)
             yield ServerSentEventGenerator.patch_elements(table_html)
-
         return DatastarResponse(table_updates())
     else:
-        return render(request, template, {
-            "table": table,
-            "table_variant": "Plain Table",
-        })
+        return render(request, template, params)
 
 

@@ -13,5 +13,7 @@ __all__ = [
     "Table4Mixin",
     "Table4ListView",
     "DynamicColumn",
+    "RequestConfig",
+    "table_render",
     "__version__",
 ]
