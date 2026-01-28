@@ -1,0 +1,82 @@
+{% load django_tables2 %}
+{# Bulma infinite scroll paginator - standard pagination + per_page control #}
+{% if table.page %}
+  <div class="level mt-3">
+    <div class="level-left">
+      <div class="level-item">
+        <span class="has-text-grey is-size-7">
+          Showing {{ table.page.start_index }}-{{ table.page.end_index }} of {{ table.paginator.count }} results
+        </span>
+      </div>
+    </div>
+    <div class="level-right">
+      <div class="level-item">
+        <label class="label is-small mb-0 mr-2" for="per_page_input">Rows:</label>
+      </div>
+      <form>
+        <div class="level-item">
+          <input type="number"
+                 name="per_page"
+                 id="per_page_input"
+                 class="form-control form-control-sm"
+                 style="width: 80px;"
+                 value="{{ table.paginator.per_page }}"
+                 min="5"
+                 max="5000"
+                 step="5">
+        </div>
+      </form>
+    </div>
+  </div>
+  {% if table.paginator.num_pages > 1 %}
+    <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+      {% if table.page.has_previous %}
+        <a class="pagination-previous" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.previous_page_number %}')">Previous</a>
+      {% else %}
+        <a class="pagination-previous" disabled>Previous</a>
+      {% endif %}
+
+      {% if table.page.has_next %}
+        <a class="pagination-next" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.next_page_number %}')">Next</a>
+      {% else %}
+        <a class="pagination-next" disabled>Next</a>
+      {% endif %}
+
+      <ul class="pagination-list">
+        {% if table.page.number > 2 %}
+          <li>
+            <a class="pagination-link" data-on:click="@get('{% querystring table.prefixed_page_field=1 %}')">1</a>
+          </li>
+          {% if table.page.number > 3 %}
+            <li><span class="pagination-ellipsis">&hellip;</span></li>
+          {% endif %}
+        {% endif %}
+
+        {% if table.page.has_previous %}
+          <li>
+            <a class="pagination-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.previous_page_number %}')">{{ table.page.previous_page_number }}</a>
+          </li>
+        {% endif %}
+
+        <li>
+          <a class="pagination-link is-current" aria-current="page">{{ table.page.number }}</a>
+        </li>
+
+        {% if table.page.has_next %}
+          <li>
+            <a class="pagination-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.next_page_number %}')">{{ table.page.next_page_number }}</a>
+          </li>
+        {% endif %}
+
+        {% if table.page.number < table.paginator.num_pages|add:"-1" %}
+          {% if table.page.number < table.paginator.num_pages|add:"-2" %}
+            <li><span class="pagination-ellipsis">Loading...</span></li>
+          {% endif %}
+          <li>
+            <a class="pagination-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.paginator.num_pages %}')">{{ table.paginator.num_pages }}</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+{% endif %}

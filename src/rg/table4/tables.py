@@ -18,6 +18,7 @@ class Table4Meta:
         filterset_class: django-filter FilterSet class (optional)
         enable_filters: Enable django-filter integration (default: False)
         enable_sorting: Enable column sorting (default: True)
+        infinite_scroll: Enable infinite scroll pagination (default: False)
     """
 
     pass
@@ -41,11 +42,13 @@ class Table4(tables.Table):
         template_kit = "bootstrap"
         enable_filters = False
         enable_sorting = True
+        infinite_scroll = False
 
     def __init__(
         self,
         *args: Any,
         template_kit: str | None = None,
+        template_name: str | None = None,
         name: str = "",
         **kwargs: Any,
     ) -> None:
@@ -56,14 +59,18 @@ class Table4(tables.Table):
         super().__init__(*args, **kwargs)
 
         # Setup template based on template_kit
-        # Priority: kwarg > Meta.template_kit > settings.TABLE4_DEFAULT_TEMPLATE_KIT > "bootstrap"
+        # Priority: template_name kwarg > template_kit kwarg > Meta.template_kit > settings
         from django.conf import settings
 
-        if template_kit is None:
-            default_kit = getattr(settings, "TABLE4_DEFAULT_TEMPLATE_KIT", "bootstrap")
-            template_kit = getattr(self.Meta, "template_kit", None) or default_kit
-
-        # Set template if: explicit kwarg passed, or template not yet set, or still default
-        if explicit_kit or not getattr(self._meta, "template_name", None) or self._meta.template_name == "django_tables2/table.html":
+        if template_name:
+            # Explicit template_name takes highest priority
+            self._meta.template_name = template_name
+        elif (
+            explicit_kit
+            or not getattr(self._meta, "template_name", None)
+            or self._meta.template_name == "django_tables2/table.html"
+        ):
+            if template_kit is None:
+                default_kit = getattr(settings, "TABLE4_DEFAULT_TEMPLATE_KIT", "bootstrap")
+                template_kit = getattr(self.Meta, "template_kit", None) or default_kit
             self._meta.template_name = f"rg_table4/{template_kit}/table.html"
-

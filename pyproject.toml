@@ -98,4 +98,5 @@ django_settings_module = "tests.settings"
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 python_files = ["test_*.py"]
+pythonpath = ["."]
 addopts = "-v --tb=short"

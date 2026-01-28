@@ -1,0 +1,15 @@
+{% extends 'rg_table4/bulma/table.html' %}
+{% load django_tables2 %}
+{# Bulma infinite scroll table template #}
+
+{% block paginator %}
+  {% include 'rg_table4/bulma/paginator_infinite.html' %}
+  {# Scroll trigger - placed one full viewport below to ensure scrolling is required #}
+  {% if table.page.has_next %}
+    <div id="table_{{ table.table_name }}_scroll_trigger"
+         style="height: 100vh; display: flex; align-items: flex-end;">
+      <p style="visibility: hidden;"
+         data-on-intersect="@get('?per_page={{ table.paginator.per_page|add:15 }}')">Loading...</p>
+    </div>
+  {% endif %}
+{% endblock %}
