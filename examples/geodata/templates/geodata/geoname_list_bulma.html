@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoNames - Table Demo (Bulma)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <section class="section">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+          <ul>
+            <li><a href="{% url 'geodata:index' %}">rg.table Demo</a></li>
+            <li><a href="{% url 'geodata:index-bulma' %}">Bulma</a></li>
+            <li class="is-active"><a href="#" aria-current="page">{{ table_variant }}</a></li>
+          </ul>
+        </nav>
+
+        <h1 class="title">GeoNames Data</h1>
+        <p class="subtitle">
+          Showing {{ table.page.paginator.count|default:"0" }} locations
+        </p>
+
+        {% load django_tables2 %}
+        {% render_table table %}
+      </div>
+    </section>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>
+  </body>
+</html>

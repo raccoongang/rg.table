@@ -5,10 +5,10 @@ import pytest
 from datastar_py.django import DatastarResponse
 from django.http import HttpResponse
 
-from rg.table4 import RequestConfig, Table4, table_render
+from rg.table import RequestConfig, Table, table_render
 
 
-class ViewTable(Table4):
+class ViewTable(Table):
     """Table for view tests."""
 
     id = tables.Column()
@@ -41,7 +41,7 @@ class TestTableRenderRegular:
         """Regular request returns HttpResponse."""
         response = table_render(
             get_request,
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": configured_table},
         )
         assert isinstance(response, HttpResponse)
@@ -51,7 +51,7 @@ class TestTableRenderRegular:
         """Response contains rendered table HTML."""
         response = table_render(
             get_request,
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": configured_table},
         )
         content = response.content.decode("utf-8")
@@ -65,7 +65,7 @@ class TestTableRenderDatastar:
         """Datastar request returns DatastarResponse."""
         response = table_render(
             datastar_request,
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": configured_table_datastar},
         )
         assert isinstance(response, DatastarResponse)
@@ -74,7 +74,7 @@ class TestTableRenderDatastar:
         """DatastarResponse is a streaming response."""
         response = table_render(
             datastar_request,
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": configured_table_datastar},
         )
         assert response.streaming is True
@@ -83,7 +83,7 @@ class TestTableRenderDatastar:
         """DatastarResponse has correct content type."""
         response = table_render(
             datastar_request,
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": configured_table_datastar},
         )
         assert "text/event-stream" in response["Content-Type"]
@@ -96,7 +96,7 @@ class TestTableRenderContext:
         """Extra context is passed to template."""
         response = table_render(
             get_request,
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {
                 "table": configured_table,
                 "extra_var": "test_value",
@@ -108,7 +108,7 @@ class TestTableRenderContext:
     def test_table_in_params_required(self, get_request):
         """table must be in params."""
         with pytest.raises(KeyError):
-            table_render(get_request, "rg_table4/bootstrap/table.html", {})
+            table_render(get_request, "rg_table/bootstrap/table.html", {})
 
 
 class TestDatastarRequestDetection:
@@ -122,7 +122,7 @@ class TestDatastarRequestDetection:
 
         response = table_render(
             request,
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table},
         )
         assert isinstance(response, DatastarResponse)
@@ -135,7 +135,7 @@ class TestDatastarRequestDetection:
 
         response = table_render(
             request,
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table},
         )
         assert isinstance(response, HttpResponse)
@@ -149,7 +149,7 @@ class TestDatastarRequestDetection:
 
         response = table_render(
             request,
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table},
         )
         # Should be regular response since header is not 'true'

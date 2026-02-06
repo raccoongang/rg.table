@@ -1,5 +1,5 @@
 [project]
-name = "rg-table4"
+name = "rg-table"
 version = "0.1.0"
 description = "Django table rendering helper extending django-tables2 with Bootstrap/Bulma templates and Datastar integration"
 readme = "README.md"
@@ -41,8 +41,12 @@ dev = [
     "django-stubs>=5.0",
     "pre-commit>=3.7",
 ]
+docs = [
+    "mkdocs-material>=9.5",
+    "pymdown-extensions>=10.0",
+]
 all = [
-    "rg-table4[filters,dev]",
+    "rg-table[filters,dev,docs]",
 ]
 
 [tool.ruff]
@@ -50,30 +54,7 @@ target-version = "py312"
 line-length = 120
 
 [tool.ruff.lint]
-# These are ruff linting rule categories:                                                                                                         
 select = ["E", "F", "I", "N", "W", "UP", "DJ"]
-# ┌──────┬──────────────────────┬───────────────────────────────────────────────────────────────┐                                                 
-# │ Code │         Name         │                          Description                          │                                                 
-# ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────┤                                                 
-# │ E    │ pycodestyle errors   │ PEP 8 style errors (indentation, whitespace, line length)     │                                                 
-# ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────┤                                                 
-# │ F    │ Pyflakes             │ Logic errors (undefined names, unused imports/variables)      │                                                 
-# ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────┤                                                 
-# │ I    │ isort                │ Import sorting and organization                               │                                                 
-# ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────┤                                                 
-# │ N    │ pep8-naming          │ Naming conventions (classes CamelCase, functions snake_case)  │                                                 
-# ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────┤                                                 
-# │ W    │ pycodestyle warnings │ PEP 8 style warnings (less severe than E)                     │                                                 
-# ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────┤                                                 
-# │ UP   │ pyupgrade            │ Modernize syntax for your target Python version (e.g., use `  │                                                 
-# ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────┤                                                 
-# │ DJ   │ flake8-django        │ Django-specific rules (model ordering, __str__ methods, etc.) │                                                 
-# └──────┴──────────────────────┴───────────────────────────────────────────────────────────────┘                                                 
-# This is a reasonable selection for a Django project. You might also consider adding:                                                            
-# - B - flake8-bugbear (common bugs and design problems)                                                                                          
-# - C4 - flake8-comprehensions (better list/dict/set comprehensions)                                                                              
-# - SIM - flake8-simplify (code simplification suggestions)                                                                                       
-# - RUF - Ruff-specific rules                                                                                                                     
 
 [tool.mypy]
 python_version = "3.12"
@@ -81,9 +62,9 @@ plugins = ["mypy_django_plugin.main"]
 strict = true
 
 [project.urls]
-Homepage = "https://github.com/avkoval/rg.table4"
-Documentation = "https://github.com/avkoval/rg.table4#readme"
-Repository = "https://github.com/avkoval/rg.table4"
+Homepage = "https://github.com/raccoongang/rg.table"
+Documentation = "https://raccoongang.github.io/rg.table"
+Repository = "https://github.com/raccoongang/rg.table"
 
 [build-system]
 requires = ["hatchling"]

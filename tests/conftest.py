@@ -1,10 +1,17 @@
-"""Pytest configuration and shared fixtures for rg.table4 tests."""
+"""Pytest configuration and shared fixtures for rg.table tests."""
+
+import django
+import os
+
+# Configure Django settings before any Django imports
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.settings")
+django.setup()
 
 import django_tables2 as tables
 import pytest
 from django.test import RequestFactory
 
-from rg.table4 import Table4
+from rg.table import Table
 
 
 # Sample data for testing
@@ -45,14 +52,14 @@ def datastar_request(request_factory):
 
 
 # Table classes for testing
-class SimpleTable(Table4):
+class SimpleTable(Table):
     """Simple table with no explicit template_kit."""
 
     id = tables.Column()
     name = tables.Column()
 
 
-class BootstrapTable(Table4):
+class BootstrapTable(Table):
     """Table with Bootstrap template_kit."""
 
     id = tables.Column()
@@ -63,7 +70,7 @@ class BootstrapTable(Table4):
         template_kit = "bootstrap"
 
 
-class BulmaTable(Table4):
+class BulmaTable(Table):
     """Table with Bulma template_kit."""
 
     id = tables.Column()
@@ -74,7 +81,7 @@ class BulmaTable(Table4):
         template_kit = "bulma"
 
 
-class SortableTable(Table4):
+class SortableTable(Table):
     """Table with sortable columns."""
 
     id = tables.Column(orderable=True)
@@ -86,7 +93,7 @@ class SortableTable(Table4):
         orderable = True
 
 
-class InfiniteScrollTable(Table4):
+class InfiniteScrollTable(Table):
     """Table with infinite scroll enabled."""
 
     id = tables.Column()

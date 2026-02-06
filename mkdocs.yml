@@ -1,0 +1,62 @@
+site_name: rg.table
+site_description: Django table rendering helper with Bootstrap/Bulma templates and Datastar integration
+site_url: https://raccoongang.github.io/rg.table
+repo_url: https://github.com/raccoongang/rg.table
+repo_name: raccoongang/rg.table
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - content.code.annotate
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - def_list
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - Guide:
+      - Template Kits: guide/template-kits.md
+      - Sorting: guide/sorting.md
+      - Filtering: guide/filtering.md
+      - Pagination: guide/pagination.md
+      - Infinite Scroll: guide/infinite-scroll.md
+      - Datastar Integration: guide/datastar.md
+  - Reference:
+      - Table Class: reference/table.md
+      - Template Tags: reference/template-tags.md
+      - Settings: reference/settings.md
+  - Examples: examples.md

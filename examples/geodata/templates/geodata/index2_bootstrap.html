@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Demo - Index</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'geodata:index' %}">rg.table Demo</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Bootstrap</li>
+            </ol>
+        </nav>
+
+        <h1>rg.table Demo</h1>
+        <p class="text-muted">Select template kit and table variation</p>
+
+        <!-- Template Kit Selector -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Template Kit</h5>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'geodata:index-bootstrap' %}" class="btn btn-primary">
+                        Bootstrap
+                    </a>
+                    <a href="{% url 'geodata:index-bulma' %}" class="btn btn-outline-secondary">
+                        Bulma
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Variations -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Table Variations</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Variation</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Link</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Plain Table</td>
+                            <td>Basic table rendering, no sorting</td>
+                            <td><span class="badge bg-success">Ready</span></td>
+                            <td><a href="{% url 'geodata:plain-bootstrap' %}" class="btn btn-sm btn-primary">View</a></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Sortable Table</td>
+                            <td>Table with column sorting enabled</td>
+                            <td><span class="badge bg-success">Ready</span></td>
+                            <td><a href="{% url 'geodata:sortable-bootstrap' %}" class="btn btn-sm btn-primary">View</a></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Sortable + Filters</td>
+                            <td>Table with sorting and django-filter integration</td>
+                            <td><span class="badge bg-success">Ready</span></td>
+                            <td><a href="{% url 'geodata:filtered-bootstrap' %}" class="btn btn-sm btn-primary">View</a></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Infinite Scroll</td>
+                            <td>Table with infinite scroll (Datastar)</td>
+                            <td><span class="badge bg-success">Ready</span></td>
+                            <td><a href="{% url 'geodata:infinite-bootstrap' %}" class="btn btn-sm btn-primary">View</a></td>
+                        </tr>
+                        <tr>
+                          <td>5</td>
+                          <td>Row Selection & Actions</td>
+                          <td>Checkboxes for row selection with bulk actions</td>
+                          <td><span class="badge bg-warning text-dark">Planned</span></td>
+                          <td><button class="btn btn-sm btn-secondary" disabled>Coming</button></td>
+                        </tr>
+                        <tr>
+                          <td>6</td>
+                          <td>Export</td>
+                          <td>Export table data to CSV/XLSX formats</td>
+                          <td><span class="badge bg-warning text-dark">Planned</span></td>
+                          <td><button class="btn btn-sm btn-secondary" disabled>Coming</button></td>
+                        </tr>
+                        <tr>
+                          <td>7</td>
+                          <td>Dynamic Columns</td>
+                          <td>Dynamic columns, static profiles, user profiles</td>
+                          <td><span class="badge bg-warning text-dark">Planned</span></td>
+                          <td><button class="btn btn-sm btn-secondary" disabled>Coming</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>
+
+</body>
+</html>

@@ -1,11 +1,11 @@
-"""Tests for Table4 class."""
+"""Tests for Table class."""
 
 import django_tables2 as tables
 
-from rg.table4 import Table4, Table4Meta
+from rg.table import Table, TableMeta
 
 
-class SimpleTable(Table4):
+class SimpleTable(Table):
     """Simple test table."""
 
     id = tables.Column()
@@ -15,8 +15,8 @@ class SimpleTable(Table4):
         template_kit = "bootstrap"
 
 
-class TestTable4Creation:
-    """Tests for Table4 instantiation."""
+class TestTableCreation:
+    """Tests for Table instantiation."""
 
     def test_table_creation_with_data(self, sample_data):
         """Table can be created with data."""
@@ -49,7 +49,7 @@ class TestTemplateKitSelection:
     def test_meta_template_kit_bootstrap(self, sample_data):
         """Meta template_kit is respected."""
 
-        class BootstrapTable(Table4):
+        class BootstrapTable(Table):
             class Meta:
                 template_kit = "bootstrap"
 
@@ -59,7 +59,7 @@ class TestTemplateKitSelection:
     def test_meta_template_kit_bulma(self, sample_data):
         """Meta template_kit bulma is respected."""
 
-        class BulmaTable(Table4):
+        class BulmaTable(Table):
             class Meta:
                 template_kit = "bulma"
 
@@ -69,7 +69,7 @@ class TestTemplateKitSelection:
     def test_constructor_template_kit_overrides_meta(self, sample_data):
         """Constructor template_kit overrides Meta."""
 
-        class BootstrapTable(Table4):
+        class BootstrapTable(Table):
             class Meta:
                 template_kit = "bootstrap"
 
@@ -85,12 +85,12 @@ class TestTemplateKitSelection:
     def test_template_name_format(self, sample_data):
         """Template name follows expected format."""
 
-        class FreshTable(Table4):
+        class FreshTable(Table):
             class Meta:
                 template_kit = "bootstrap"
 
         table = FreshTable(sample_data)
-        assert table.template_name == "rg_table4/bootstrap/table.html"
+        assert table.template_name == "rg_table/bootstrap/table.html"
 
 
 class TestTableName:
@@ -113,12 +113,12 @@ class TestTableName:
 
 
 class TestMetaOptions:
-    """Tests for Table4Meta options."""
+    """Tests for TableMeta options."""
 
     def test_enable_filters_default_false(self):
         """enable_filters defaults to False."""
 
-        class TestTable(Table4):
+        class TestTable(Table):
             class Meta:
                 template_kit = "bootstrap"
 
@@ -127,7 +127,7 @@ class TestMetaOptions:
     def test_enable_sorting_default_true(self):
         """enable_sorting defaults to True."""
 
-        class TestTable(Table4):
+        class TestTable(Table):
             class Meta:
                 template_kit = "bootstrap"
 
@@ -136,7 +136,7 @@ class TestMetaOptions:
     def test_infinite_scroll_default_false(self):
         """infinite_scroll defaults to False."""
 
-        class TestTable(Table4):
+        class TestTable(Table):
             class Meta:
                 template_kit = "bootstrap"
 
@@ -145,7 +145,7 @@ class TestMetaOptions:
     def test_infinite_scroll_can_be_enabled(self):
         """infinite_scroll can be enabled."""
 
-        class InfiniteTable(Table4):
+        class InfiniteTable(Table):
             class Meta:
                 template_kit = "bootstrap"
                 infinite_scroll = True
@@ -168,17 +168,17 @@ class TestFiltersetIntegration:
         assert table.filterset is mock_filterset
 
 
-class TestTable4Meta:
-    """Tests for Table4Meta class."""
+class TestTableMeta:
+    """Tests for TableMeta class."""
 
     def test_meta_class_exists(self):
-        """Table4Meta class is importable."""
-        assert Table4Meta is not None
+        """TableMeta class is importable."""
+        assert TableMeta is not None
 
     def test_meta_can_be_inherited(self):
-        """Table4Meta can be inherited."""
+        """TableMeta can be inherited."""
 
-        class MyMeta(Table4Meta):
+        class MyMeta(TableMeta):
             template_kit = "bulma"
             custom_option = True
 

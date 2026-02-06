@@ -2,10 +2,10 @@
 
 import django_tables2 as tables
 
-from rg.table4 import RequestConfig, Table4
+from rg.table import RequestConfig, Table
 
 
-class PaginatedTable(Table4):
+class PaginatedTable(Table):
     """Table for pagination tests."""
 
     id = tables.Column()
@@ -126,7 +126,7 @@ class TestPrefixedFields:
     def test_prefixed_page_field(self, request_factory, large_data):
         """Prefixed page field works with table prefix."""
 
-        class PrefixedTable(Table4):
+        class PrefixedTable(Table):
             id = tables.Column()
 
             class Meta:
@@ -141,7 +141,7 @@ class TestPrefixedFields:
     def test_prefixed_per_page_field(self, request_factory, large_data):
         """Prefixed per_page field works with table prefix."""
 
-        class PrefixedTable(Table4):
+        class PrefixedTable(Table):
             id = tables.Column()
 
             class Meta:

@@ -1,69 +1,110 @@
-# ok.table4
+# rg.table
+
+[![CI](https://github.com/raccoongang/rg.table/actions/workflows/ci.yml/badge.svg)](https://github.com/raccoongang/rg.table/actions/workflows/ci.yml)
+[![Documentation](https://github.com/raccoongang/rg.table/actions/workflows/docs.yml/badge.svg)](https://raccoongang.github.io/rg.table)
 
 Django table rendering helper extending django-tables2 with Bootstrap/Bulma templates and Datastar integration.
 
 ## Installation
 
+```bash
+pip install rg-table
+```
 
+Or with uv:
+
+```bash
+uv add rg-table
+```
 
 ## Quick Start
 
+```python
+# tables.py
+import django_tables2 as tables
+from rg.table import Table, TableMeta
 
+class BookTable(Table):
+    title = tables.Column()
+    author = tables.Column()
+
+    class Meta(TableMeta):
+        template_kit = "bootstrap"  # or "bulma"
+```
+
+```python
+# views.py
+from rg.table import RequestConfig
+
+def book_list(request):
+    table = BookTable(Book.objects.all())
+    RequestConfig(request, paginate={"per_page": 25}).configure(table)
+    return render(request, "books/list.html", {"table": table})
+```
+
+```html
+{% load django_tables2 %}
+{% render_table table %}
+```
 
 ## Features
 
-- Bootstrap 5 and Bulma CSS templates
-- Datastar integration for reactive tables
-- Optional dynamic columns
-- django-filter integration
-- Sorting support
+- **Bootstrap 5 and Bulma CSS templates** - Pre-built, responsive table templates
+- **Datastar integration** - Reactive tables with infinite scroll
+- **django-filter integration** - Easy filtering with django-filter
+- **Sorting support** - Clickable column headers for sorting
+
+## Documentation
+
+Full documentation: [https://raccoongang.github.io/rg.table](https://raccoongang.github.io/rg.table)
 
 ## Development
 
 ### Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/avkoval/rg.table4.git
-cd rg.table4
+git clone https://github.com/raccoongang/rg.table.git
+cd rg.table
 
-# Create virtual environment and install dependencies
 uv venv
 source .venv/bin/activate
-uv pip install -e ".[all]"
+uv sync --all-extras
 ```
 
 ### Running Tests
 
 ```bash
-# Run all tests
-uv run pytest
-
-# Run with verbose output
-uv run pytest -v
-
-# Run with coverage
-uv run pytest --cov=src/rg/table4
-
-# Run specific test file
-uv run pytest tests/test_tables.py
-
-# Run specific test class or method
-uv run pytest tests/test_tables.py::TestTable4Creation
-uv run pytest tests/test_tables.py::TestTable4Creation::test_table_creation_with_data
+.venv/bin/pytest
+.venv/bin/pytest --cov=src/rg/table
 ```
+
+### Running Examples
+
+```bash
+cd examples
+uv venv
+source .venv/bin/activate
+uv pip install -e "..[all]"
+python manage.py migrate
+python manage.py import_geonames --dataset=cities15000
+python manage.py runserver
+```
+
+Visit http://localhost:8000/geodata/
 
 ### Linting and Type Checking
 
 ```bash
-# Run ruff linter
-uv run ruff check src/ tests/
+.venv/bin/ruff check src/ tests/
+.venv/bin/ruff format src/ tests/
+.venv/bin/mypy src/
+```
 
-# Run ruff formatter
-uv run ruff format src/ tests/
+### Building Documentation
 
-# Run mypy type checker
-uv run mypy src/
+```bash
+uv pip install mkdocs-material pymdown-extensions
+mkdocs serve
 ```
 
 ## License

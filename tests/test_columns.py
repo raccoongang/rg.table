@@ -2,10 +2,10 @@
 
 import django_tables2 as tables
 
-from rg.table4 import DynamicColumn, Table4
+from rg.table import DynamicColumn, Table
 
 
-class BaseTable(Table4):
+class BaseTable(Table):
     """Base table for dynamic column tests."""
 
     id = tables.Column()
@@ -36,7 +36,7 @@ class TestDynamicColumnCreation:
 
 
 class TestDynamicColumnWithTable:
-    """Tests for DynamicColumn used with Table4."""
+    """Tests for DynamicColumn used with Table."""
 
     def test_extra_columns_with_dynamic_column(self, sample_data):
         """Table can use DynamicColumn via extra_columns."""

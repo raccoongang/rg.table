@@ -27,3 +27,13 @@ htmlcov/
 
 # uv
 uv.lock
+
+# Examples
+examples/db.sqlite3
+examples/.venv/
+
+# MkDocs
+site/
+
+# Ruff
+.ruff_cache/

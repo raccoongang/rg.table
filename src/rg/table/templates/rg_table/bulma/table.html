@@ -1,0 +1,10 @@
+{% load django_tables2 %}
+{# Bulma table template - base template with blocks #}
+<div id="table_{{ table.table_name }}_inner">
+  {% block table %}
+    {% include 'rg_table/bulma/table_body.html' %}
+  {% endblock %}
+  {% block paginator %}
+    {% include 'rg_table/bulma/paginator_simple.html' %}
+  {% endblock %}
+</div>

@@ -4,10 +4,10 @@ import django_tables2 as tables
 import pytest
 from django.template.loader import get_template, render_to_string
 
-from rg.table4 import RequestConfig, Table4
+from rg.table import RequestConfig, Table
 
 
-class TemplateTable(Table4):
+class TemplateTable(Table):
     """Table for template tests."""
 
     id = tables.Column()
@@ -32,12 +32,12 @@ class TestTemplateExists:
     @pytest.mark.parametrize(
         "template_path",
         [
-            "rg_table4/bootstrap/table.html",
-            "rg_table4/bootstrap/table_body.html",
-            "rg_table4/bootstrap/paginator_simple.html",
-            "rg_table4/bootstrap/table_filtered.html",
-            "rg_table4/bootstrap/table_infinite.html",
-            "rg_table4/bootstrap/paginator_infinite.html",
+            "rg_table/bootstrap/table.html",
+            "rg_table/bootstrap/table_body.html",
+            "rg_table/bootstrap/paginator_simple.html",
+            "rg_table/bootstrap/table_filtered.html",
+            "rg_table/bootstrap/table_infinite.html",
+            "rg_table/bootstrap/paginator_infinite.html",
         ],
     )
     def test_bootstrap_templates_exist(self, template_path):
@@ -48,12 +48,12 @@ class TestTemplateExists:
     @pytest.mark.parametrize(
         "template_path",
         [
-            "rg_table4/bulma/table.html",
-            "rg_table4/bulma/table_body.html",
-            "rg_table4/bulma/paginator_simple.html",
-            "rg_table4/bulma/table_filtered.html",
-            "rg_table4/bulma/table_infinite.html",
-            "rg_table4/bulma/paginator_infinite.html",
+            "rg_table/bulma/table.html",
+            "rg_table/bulma/table_body.html",
+            "rg_table/bulma/paginator_simple.html",
+            "rg_table/bulma/table_filtered.html",
+            "rg_table/bulma/table_infinite.html",
+            "rg_table/bulma/paginator_infinite.html",
         ],
     )
     def test_bulma_templates_exist(self, template_path):
@@ -68,7 +68,7 @@ class TestBootstrapTemplateRendering:
     def test_table_renders(self, table_with_request, get_request):
         """Bootstrap table template renders."""
         html = render_to_string(
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table_with_request},
             get_request,
         )
@@ -78,7 +78,7 @@ class TestBootstrapTemplateRendering:
     def test_table_contains_data(self, table_with_request, get_request):
         """Rendered table contains data."""
         html = render_to_string(
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table_with_request},
             get_request,
         )
@@ -88,7 +88,7 @@ class TestBootstrapTemplateRendering:
     def test_table_has_headers(self, table_with_request, get_request):
         """Rendered table has column headers."""
         html = render_to_string(
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table_with_request},
             get_request,
         )
@@ -104,7 +104,7 @@ class TestBootstrapTemplateRendering:
         RequestConfig(get_request, paginate={"per_page": 10}).configure(table)
 
         html = render_to_string(
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table},
             get_request,
         )
@@ -117,7 +117,7 @@ class TestBulmaTemplateRendering:
     def test_table_renders(self, sample_data, get_request):
         """Bulma table template renders."""
 
-        class BulmaTable(Table4):
+        class BulmaTable(Table):
             id = tables.Column()
             name = tables.Column()
 
@@ -128,7 +128,7 @@ class TestBulmaTemplateRendering:
         RequestConfig(get_request, paginate={"per_page": 10}).configure(table)
 
         html = render_to_string(
-            "rg_table4/bulma/table.html",
+            "rg_table/bulma/table.html",
             {"table": table},
             get_request,
         )
@@ -138,7 +138,7 @@ class TestBulmaTemplateRendering:
     def test_table_contains_data(self, sample_data, get_request):
         """Rendered Bulma table contains data."""
 
-        class BulmaTable(Table4):
+        class BulmaTable(Table):
             id = tables.Column()
             name = tables.Column()
             country = tables.Column()
@@ -150,7 +150,7 @@ class TestBulmaTemplateRendering:
         RequestConfig(get_request, paginate={"per_page": 10}).configure(table)
 
         html = render_to_string(
-            "rg_table4/bulma/table.html",
+            "rg_table/bulma/table.html",
             {"table": table},
             get_request,
         )
@@ -167,7 +167,7 @@ class TestInfiniteScrollTemplate:
         RequestConfig(get_request, paginate={"per_page": 3}).configure(table)
 
         html = render_to_string(
-            "rg_table4/bootstrap/table_infinite.html",
+            "rg_table/bootstrap/table_infinite.html",
             {"table": table},
             get_request,
         )
@@ -180,7 +180,7 @@ class TestInfiniteScrollTemplate:
         RequestConfig(get_request, paginate={"per_page": 10}).configure(table)
 
         html = render_to_string(
-            "rg_table4/bootstrap/table_infinite.html",
+            "rg_table/bootstrap/table_infinite.html",
             {"table": table},
             get_request,
         )
@@ -194,7 +194,7 @@ class TestTableName:
     def test_table_name_in_wrapper_id(self, table_with_request, get_request):
         """Table name appears in wrapper div id."""
         html = render_to_string(
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table_with_request},
             get_request,
         )
@@ -206,7 +206,7 @@ class TestTableName:
         RequestConfig(get_request, paginate={"per_page": 10}).configure(table)
 
         html = render_to_string(
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table},
             get_request,
         )
@@ -222,7 +222,7 @@ class TestEmptyTable:
         RequestConfig(get_request, paginate={"per_page": 10}).configure(table)
 
         html = render_to_string(
-            "rg_table4/bootstrap/table.html",
+            "rg_table/bootstrap/table.html",
             {"table": table},
             get_request,
         )

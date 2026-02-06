@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoNames - Table Demo (Bootstrap)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container mt-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'geodata:index' %}">rg.table Demo</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'geodata:index-bootstrap' %}">Bootstrap</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ table_variant }}</li>
+        </ol>
+      </nav>
+
+      <h1>GeoNames Data</h1>
+      <p class="text-muted">
+        Showing {{ table.page.paginator.count|default:"0" }} locations
+      </p>
+
+      {% load django_tables2 %}
+      {% render_table table %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>
+  </body>
+</html>

@@ -1,1 +1,1 @@
-"""Tests for rg.table4."""
+"""Tests for rg.table."""
