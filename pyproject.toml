@@ -61,6 +61,17 @@ python_version = "3.12"
 plugins = ["mypy_django_plugin.main"]
 strict = true
 
+[[tool.mypy.overrides]]
+module = [
+    "django_tables2",
+    "django_tables2.*",
+    "django_filters",
+    "django_filters.*",
+    "datastar",
+    "datastar.*",
+]
+ignore_missing_imports = true
+
 [project.urls]
 Homepage = "https://github.com/raccoongang/rg.table"
 Documentation = "https://raccoongang.github.io/rg.table"

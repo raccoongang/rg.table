@@ -24,7 +24,7 @@ class TableMeta:
     pass
 
 
-class Table(tables.Table):
+class Table(tables.Table):  # type: ignore[misc]
     """
     Extended django-tables2 Table with Datastar and filter support.
 

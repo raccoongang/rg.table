@@ -1,17 +1,18 @@
 """Pytest configuration and shared fixtures for rg.table tests."""
 
-import django
 import os
+
+import django
 
 # Configure Django settings before any Django imports
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.settings")
 django.setup()
 
-import django_tables2 as tables
-import pytest
-from django.test import RequestFactory
+import django_tables2 as tables  # noqa: E402
+import pytest  # noqa: E402
+from django.test import RequestFactory  # noqa: E402
 
-from rg.table import Table
+from rg.table import Table  # noqa: E402
 
 
 # Sample data for testing

@@ -6,7 +6,7 @@ from typing import Any
 import django_tables2 as tables
 
 
-class DynamicColumn(tables.Column):
+class DynamicColumn(tables.Column):  # type: ignore[misc]
     """
     A column that can be dynamically configured at runtime.
 

@@ -1,4 +1,7 @@
+from typing import Any
+
 from django.core.paginator import EmptyPage, PageNotAnInteger
+from django.http import HttpRequest
 
 
 class RequestConfig:
@@ -26,11 +29,11 @@ class RequestConfig:
 
     """
 
-    def __init__(self, request, paginate=True):
+    def __init__(self, request: HttpRequest, paginate: dict[str, Any] | bool = True) -> None:
         self.request = request
         self.paginate = paginate
 
-    def configure(self, table):
+    def configure(self, table: Any) -> Any:
         """
         Configure a table using information from the request.
 
@@ -45,8 +48,8 @@ class RequestConfig:
         if order_by:
             table.order_by = order_by
         if self.paginate:
-            if hasattr(self.paginate, "items"):
-                kwargs = dict(self.paginate)
+            if isinstance(self.paginate, dict):
+                kwargs: dict[str, Any] = dict(self.paginate)
             else:
                 kwargs = {}
             # extract some options from the request
