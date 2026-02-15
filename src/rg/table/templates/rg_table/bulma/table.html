@@ -1,6 +1,9 @@
 {% load django_tables2 %}
 {# Bulma table template - base template with blocks #}
 <div id="table_{{ table.table_name }}_inner">
+  {% block columns_selector %}
+    {% include 'rg_table/bulma/columns_selector.html' %}
+  {% endblock %}
   {% block table %}
     {% include 'rg_table/bulma/table_body.html' %}
   {% endblock %}

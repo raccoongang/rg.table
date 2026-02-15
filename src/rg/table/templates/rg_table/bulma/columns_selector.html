@@ -1,0 +1,44 @@
+{% if table.enable_column_selection and table.all_columns_meta %}
+<div class="dropdown mb-2"
+     id="col_sel_{{ table.table_name }}"
+     data-signals:table-{{ table.table_name }}-col-sel-open="false"
+     data-class:is-active="$table{{ table.table_name }}ColSelOpen">
+  <div class="dropdown-trigger">
+    <button class="button is-small"
+            type="button"
+            aria-haspopup="true"
+            data-on:click="$table{{ table.table_name }}ColSelOpen = !$table{{ table.table_name }}ColSelOpen">
+      <span>Columns</span>
+      <span class="icon is-small">&#9662;</span>
+    </button>
+  </div>
+  <div class="dropdown-menu" role="menu" style="min-width: 180px;">
+    <div class="dropdown-content py-2">
+      <form>
+        {% csrf_token %}
+        <input type="hidden" name="_columns_submit" value="1">
+        {% for col in table.all_columns_meta %}
+        <label class="dropdown-item is-flex is-align-items-center" style="gap: 0.5rem; cursor: pointer;">
+          <input type="checkbox"
+                 name="_columns"
+                 value="{{ col.name }}"
+                 {% if col.visible %}checked{% endif %}
+                 {% if col.pinned %}disabled{% endif %} />
+          {{ col.header }}
+        </label>
+        {% if col.pinned %}
+        <input type="hidden" name="_columns" value="{{ col.name }}">
+        {% endif %}
+        {% endfor %}
+        <div class="dropdown-item pt-2">
+          <button type="button"
+                  class="button is-primary is-small is-fullwidth"
+                  data-on:click="$table{{ table.table_name }}ColSelOpen = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
+            Apply
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}

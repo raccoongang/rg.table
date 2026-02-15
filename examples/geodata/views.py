@@ -95,6 +95,22 @@ def infinite_table_bootstrap(request):
     })
 
 
+def column_select_table_bootstrap(request):
+    """Column selection table with Bootstrap."""
+    queryset = GeoName.objects.all()
+    table = GeoNameSortableTable(
+        queryset,
+        template_kit="bootstrap",
+        name="colselect",
+        enable_column_selection=True,
+    )
+    RequestConfig(request, paginate={"per_page": 15}).configure(table)
+    return table_render(request, "geodata/geoname_list_bootstrap.html", {
+        "table": table,
+        "table_variant": "Column Selection",
+    })
+
+
 # Bulma views
 
 def index_bulma(request):
@@ -168,4 +184,20 @@ def infinite_table_bulma(request):
     return table_render(request, "geodata/geoname_list_bulma.html", {
         "table": table,
         "table_variant": "Infinite Scroll",
+    })
+
+
+def column_select_table_bulma(request):
+    """Column selection table with Bulma."""
+    queryset = GeoName.objects.all()
+    table = GeoNameSortableTable(
+        queryset,
+        template_kit="bulma",
+        name="colselect",
+        enable_column_selection=True,
+    )
+    RequestConfig(request, paginate={"per_page": 15}).configure(table)
+    return table_render(request, "geodata/geoname_list_bulma.html", {
+        "table": table,
+        "table_variant": "Column Selection",
     })

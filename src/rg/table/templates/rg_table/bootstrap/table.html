@@ -1,6 +1,9 @@
 {% load django_tables2 %}
 {# Bootstrap 5 table template - base template with blocks #}
 <div id="table_{{ table.table_name }}_inner">
+  {% block columns_selector %}
+    {% include 'rg_table/bootstrap/columns_selector.html' %}
+  {% endblock %}
   {% block table %}
     {% include 'rg_table/bootstrap/table_body.html' %}
   {% endblock %}

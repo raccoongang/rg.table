@@ -15,6 +15,11 @@
       <div class="col-md-auto">
         {% include 'rg_table/bootstrap/filters/clear.html' %}
       </div>
+      {% if table.enable_column_selection %}
+      <div class="col-md-auto ms-auto">
+        {% include 'rg_table/bootstrap/columns_selector.html' %}
+      </div>
+      {% endif %}
     </div>
   </form>
 

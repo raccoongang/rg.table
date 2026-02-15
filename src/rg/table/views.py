@@ -12,6 +12,8 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
 
+from .config import COLUMN_SELECTION_PARAM, COLUMN_SELECTION_SUBMIT
+
 
 def table_render(
     request: HttpRequest,
@@ -31,6 +33,8 @@ def table_render(
         query_params = request.GET.copy()
         query_params["page"] = table.page.number
         query_params.pop("datastar", None)
+        query_params.pop(COLUMN_SELECTION_PARAM, None)
+        query_params.pop(COLUMN_SELECTION_SUBMIT, None)
         current_url = f"{request.path}?{query_params.urlencode()}"
 
         # Update browser URL with current page number using History API

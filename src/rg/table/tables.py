@@ -19,6 +19,8 @@ class TableMeta:
         enable_filters: Enable django-filter integration (default: False)
         enable_sorting: Enable column sorting (default: True)
         infinite_scroll: Enable infinite scroll pagination (default: False)
+        enable_column_selection: Enable user column selection (default: False)
+        pinned_columns: Columns that cannot be hidden by the user (default: ())
     """
 
     pass
@@ -43,6 +45,8 @@ class Table(tables.Table):  # type: ignore[misc]
         enable_filters = False
         enable_sorting = True
         infinite_scroll = False
+        enable_column_selection = False
+        pinned_columns: tuple[str, ...] = ()
 
     def __init__(
         self,
@@ -50,6 +54,7 @@ class Table(tables.Table):  # type: ignore[misc]
         template_kit: str | None = None,
         template_name: str | None = None,
         name: str = "",
+        enable_column_selection: bool | None = None,
         **kwargs: Any,
     ) -> None:
         # Extract filter-related kwargs
@@ -57,6 +62,21 @@ class Table(tables.Table):  # type: ignore[misc]
         self.table_name = name  # For Datastar signals like table_<name>
         explicit_kit = template_kit is not None
         super().__init__(*args, **kwargs)
+
+        # Column selection: kwarg > Meta > default
+        if enable_column_selection is not None:
+            self.enable_column_selection = enable_column_selection
+        else:
+            self.enable_column_selection = getattr(
+                self.Meta, "enable_column_selection", False
+            )
+
+        self.pinned_columns: tuple[str, ...] = getattr(
+            self.Meta, "pinned_columns", ()
+        )
+
+        # all_columns_meta is populated by RequestConfig.configure()
+        self.all_columns_meta: list[dict[str, Any]] = []
 
         # Setup template based on template_kit
         # Priority: template_name kwarg > template_kit kwarg > Meta.template_kit > settings

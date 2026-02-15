@@ -16,12 +16,14 @@ urlpatterns = [
     path("bootstrap/sortable/", views.sortable_table_bootstrap, name="sortable-bootstrap"),
     path("bootstrap/filtered/", views.filtered_table_bootstrap, name="filtered-bootstrap"),
     path("bootstrap/infinite/", views.infinite_table_bootstrap, name="infinite-bootstrap"),
+    path("bootstrap/columns/", views.column_select_table_bootstrap, name="columns-bootstrap"),
 
     # Bulma tables
     path("bulma/plain/", views.plain_table_bulma, name="plain-bulma"),
     path("bulma/sortable/", views.sortable_table_bulma, name="sortable-bulma"),
     path("bulma/filtered/", views.filtered_table_bulma, name="filtered-bulma"),
     path("bulma/infinite/", views.infinite_table_bulma, name="infinite-bulma"),
+    path("bulma/columns/", views.column_select_table_bulma, name="columns-bulma"),
 
     # Default redirect to bootstrap
     path("", views.index_redirect, name="index"),

@@ -1,0 +1,45 @@
+{% if table.enable_column_selection and table.all_columns_meta %}
+<div class="dropdown d-inline-block mb-2"
+     id="col_sel_{{ table.table_name }}"
+     data-signals:table-{{ table.table_name }}-col-sel-open="false"
+     data-class:show="$table{{ table.table_name }}ColSelOpen">
+  <button class="btn btn-outline-secondary btn-sm dropdown-toggle"
+          type="button"
+          aria-expanded="false"
+          data-on:click="$table{{ table.table_name }}ColSelOpen = !$table{{ table.table_name }}ColSelOpen">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+      <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+    </svg>
+    Columns
+  </button>
+  <div class="dropdown-menu p-2"
+       data-class:show="$table{{ table.table_name }}ColSelOpen"
+       style="min-width: 180px;">
+    <form>
+      {% csrf_token %}
+      <input type="hidden" name="_columns_submit" value="1">
+      {% for col in table.all_columns_meta %}
+      <label class="dropdown-item d-flex align-items-center gap-2 py-1 user-select-none">
+        <input type="checkbox"
+               class="form-check-input m-0"
+               name="_columns"
+               value="{{ col.name }}"
+               {% if col.visible %}checked{% endif %}
+               {% if col.pinned %}disabled{% endif %} />
+        {{ col.header }}
+      </label>
+      {% if col.pinned %}
+      <input type="hidden" name="_columns" value="{{ col.name }}">
+      {% endif %}
+      {% endfor %}
+      <div class="dropdown-item pt-2">
+        <button type="button"
+                class="btn btn-primary btn-sm w-100"
+                data-on:click="$table{{ table.table_name }}ColSelOpen = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
+          Apply
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}

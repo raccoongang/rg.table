@@ -15,6 +15,11 @@
       <div class="control">
         {% include 'rg_table/bulma/filters/clear.html' %}
       </div>
+      {% if table.enable_column_selection %}
+      <div class="control ml-auto">
+        {% include 'rg_table/bulma/columns_selector.html' %}
+      </div>
+      {% endif %}
     </div>
   </form>
 
