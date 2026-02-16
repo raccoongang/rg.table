@@ -24,6 +24,8 @@ Table(
     enable_column_selection=None,
     enable_profiles=None,
     enable_per_page_selection=None,
+    actions=None,
+    row_id_field=None,
     **kwargs,
 )
 ```
@@ -36,6 +38,8 @@ Table(
 - `enable_column_selection` - Override Meta.enable_column_selection
 - `enable_profiles` - Override Meta.enable_profiles
 - `enable_per_page_selection` - Override Meta.enable_per_page_selection
+- `actions` - Tuple of `TableAction` instances (overrides Meta.actions)
+- `row_id_field` - Field name for row IDs in checkboxes (overrides Meta.row_id_field, default: "pk")
 - `**kwargs` - Passed to django_tables2.Table
 
 ### Meta Options
@@ -57,6 +61,8 @@ Inherit from `TableMeta` for rg.table features:
 | `fields`                    | tuple | None             | Fields to include                         |
 | `exclude`                   | tuple | None             | Fields to exclude                         |
 | `template_name`             | str   | None             | Override default template                 |
+| `actions`                   | tuple | ()               | Tuple of `TableAction` instances          |
+| `row_id_field`              | str   | "pk"             | Field name for row IDs in checkboxes      |
 
 ### Instance Attributes (set by RequestConfig)
 

@@ -2,10 +2,17 @@
 
 import django_tables2 as tables
 
-from rg.table import Table, TableMeta
+from rg.table import Table, TableAction, TableMeta
+from rg.table.export import ExportMixin
 
 from .filters import GeoNameFilterSet
 from .models import GeoName
+
+
+def delete_selected(request, table, selected_pks):
+    """Delete selected GeoName rows and redirect back (PRG)."""
+    GeoName.objects.filter(pk__in=selected_pks).delete()
+    return None
 
 
 class GeoNameTableBase(Table):
@@ -72,6 +79,22 @@ class GeoNameProfileTable(GeoNameTableBase):
         enable_per_page_selection = True
         per_page_choices = (10, 15, 25, 50)
         pinned_columns = ("name",)
+
+
+class GeoNameActionTable(ExportMixin, GeoNameTableBase):
+    """Table with row selection, delete action, and CSV/XLSX export."""
+
+    class Meta(GeoNameTableBase.Meta):
+        orderable = True
+        enable_column_selection = True
+        pinned_columns = ("name",)
+        actions = (
+            TableAction(
+                "delete", "Delete selected", delete_selected,
+                confirm="Are you sure you want to delete the selected rows?",
+            ),
+        )
+        row_id_field = "geonameid"
 
 
 # Alias for backwards compatibility

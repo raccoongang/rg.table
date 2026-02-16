@@ -1,10 +1,13 @@
-{% load django_tables2 %}
+{% load django_tables2 %}{% load table_tags %}
 {# Bulma table body partial - pure table markup, no paginator #}
 <div class="table-container">
   <table class="table is-striped is-hoverable is-fullwidth{% if table.attrs.class %} {{ table.attrs.class }}{% endif %}"
          {% for key, value in table.attrs.items %}{% if key != 'class' %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
     <thead>
       <tr>
+        {% if table.actions %}
+        <th style="width: 1%;"></th>
+        {% endif %}
         {% for column in table.columns %}
           <th {{ column.attrs.th.as_html }}>
             {% if column.orderable %}
@@ -23,7 +26,14 @@
     </thead>
     <tbody>
       {% for row in table.paginated_rows %}
-        <tr {{ row.attrs.as_html }}>
+        {% if table.actions %}{% row_id table row as rid %}{% endif %}
+        <tr {% if table.actions %}id="row_{{ table.table_name }}_{{ rid }}"{% endif %} {{ row.attrs.as_html }}>
+          {% if table.actions %}
+          <td style="width: 1%;">
+            <input type="checkbox" name="_selected" value="{{ rid }}"
+                   data-attr:checked="$table{{ table.table_name }}SelectAll">
+          </td>
+          {% endif %}
           {% for column, cell in row.items %}
             <td {{ column.attrs.td.as_html }}>{{ cell }}</td>
           {% endfor %}

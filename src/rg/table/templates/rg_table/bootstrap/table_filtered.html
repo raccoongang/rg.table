@@ -1,6 +1,7 @@
 {% load django_tables2 %}
 {# Bootstrap 5 filtered table template #}
-<div id="table_{{ table.table_name }}_inner">
+<div id="table_{{ table.table_name }}_inner"
+     {% if table.actions %}data-signals:table-{{ table.table_name }}-selected="[]"{% endif %}>
   {# Filter bar #}
   <form id="table_{{ table.table_name }}_form" name="table_{{ table.table_name }}_form">
     <div class="row mb-3 g-2 align-items-center">
@@ -25,7 +26,15 @@
   </form>
 
   {# Table #}
+  {% if table.actions %}
+  <form method="post" action="{{ request.get_full_path }}">
+    {% csrf_token %}
+    {% include 'rg_table/bootstrap/action_bar.html' %}
+  {% endif %}
   {% include 'rg_table/bootstrap/table_body.html' %}
+  {% if table.actions %}
+  </form>
+  {% endif %}
   {% include 'rg_table/bootstrap/paginator_simple.html' %}
   {% include 'rg_table/bootstrap/per_page_selector.html' %}
 </div>

@@ -55,6 +55,8 @@ nav:
       - Pagination: guide/pagination.md
       - Infinite Scroll: guide/infinite-scroll.md
       - Column Selection: guide/column-selection.md
+      - Profiles: guide/profiles.md
+      - Row Selection & Actions: guide/actions.md
       - Datastar Integration: guide/datastar.md
   - Reference:
       - Table Class: reference/table.md

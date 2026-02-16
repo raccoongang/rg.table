@@ -24,6 +24,8 @@ class TableMeta:
         enable_profiles: Enable named profile save/load (default: False)
         enable_per_page_selection: Enable per-page size selector (default: False)
         per_page_choices: Allowed per-page sizes (default: (10, 25, 50, 100))
+        actions: Tuple of TableAction instances for row selection & bulk actions (default: ())
+        row_id_field: Field name used as row identifier for selection checkboxes (default: "pk")
     """
 
     pass
@@ -53,6 +55,8 @@ class Table(tables.Table):  # type: ignore[misc]
         enable_profiles = False
         enable_per_page_selection = False
         per_page_choices: tuple[int, ...] = (10, 25, 50, 100)
+        actions: tuple[Any, ...] = ()
+        row_id_field: str = "pk"
 
     def __init__(
         self,
@@ -63,6 +67,8 @@ class Table(tables.Table):  # type: ignore[misc]
         enable_column_selection: bool | None = None,
         enable_profiles: bool | None = None,
         enable_per_page_selection: bool | None = None,
+        actions: tuple[Any, ...] | None = None,
+        row_id_field: str | None = None,
         **kwargs: Any,
     ) -> None:
         # Extract filter-related kwargs
@@ -108,6 +114,27 @@ class Table(tables.Table):  # type: ignore[misc]
         self.profiles_list: list[dict[str, Any]] = []
         self.active_profile: dict[str, Any] | None = None
         self.current_per_page: int | None = None
+
+        # Actions: kwarg > Meta > default
+        if actions is not None:
+            self.actions: tuple[Any, ...] = actions
+        else:
+            self.actions = getattr(self.Meta, "actions", ())
+
+        self.row_id_field: str = (
+            row_id_field
+            if row_id_field is not None
+            else getattr(self.Meta, "row_id_field", "pk")
+        )
+
+        # Visible IDs JSON for select-all expression — set by RequestConfig
+        self.visible_ids_json: str = "[]"
+
+        # Action confirm messages JSON map — set by RequestConfig
+        self.action_confirms_json: str = "{}"
+
+        # Empty selection message — set by table_render() when action skipped
+        self.empty_selection_message: str | None = None
 
         # Setup template based on template_kit
         # Priority: template_name kwarg > template_kit kwarg > Meta.template_kit > settings

@@ -32,6 +32,9 @@ dependencies = [
 filters = [
     "django-filter>=24.0",
 ]
+xlsx = [
+    "xlsxwriter>=3.1",
+]
 dev = [
     "pytest>=8.0",
     "pytest-django>=4.8",
@@ -46,7 +49,7 @@ docs = [
     "pymdown-extensions>=10.0",
 ]
 all = [
-    "rg-table[filters,dev,docs]",
+    "rg-table[filters,xlsx,dev,docs]",
 ]
 
 [tool.ruff]
@@ -69,6 +72,8 @@ module = [
     "django_filters.*",
     "datastar",
     "datastar.*",
+    "xlsxwriter",
+    "xlsxwriter.*",
 ]
 ignore_missing_imports = true
 

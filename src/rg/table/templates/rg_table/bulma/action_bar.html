@@ -1,0 +1,49 @@
+{% if table.actions %}
+<div class="is-flex is-align-items-center mb-2" style="gap: 0.5rem;"
+     data-signals="{table{{ table.table_name }}Busy: false, table{{ table.table_name }}Confirms: {{ table.action_confirms_json }}, table{{ table.table_name }}Error: ''}">
+  <label class="checkbox is-flex is-align-items-center" style="gap: 0.25rem; cursor: pointer;">
+    <input type="checkbox"
+           data-attr:checked="$table{{ table.table_name }}SelectAll"
+           data-on:click="
+             $table{{ table.table_name }}SelectAll = !$table{{ table.table_name }}SelectAll;
+             $table{{ table.table_name }}Error = '';
+           ">
+    Select all
+  </label>
+  <div class="select is-small">
+    <select name="_action">
+      {% for action in table.actions %}
+      <option value="{{ action.name }}">{{ action.label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" name="_action_submit" value="1"
+          class="button is-small"
+          data-class:is-loading="$table{{ table.table_name }}Busy"
+          data-on:click__prevent="
+            const form = evt.target.closest('form');
+            const btn = evt.target.closest('button');
+            const actionName = form.elements['_action'].value;
+            const conf = $table{{ table.table_name }}Confirms[actionName];
+            if ($table{{ table.table_name }}SelectAll && conf) {
+              $table{{ table.table_name }}Error = 'Bulk operation on all visible rows is not allowed. Select specific rows instead.';
+              return;
+            }
+            $table{{ table.table_name }}Error = '';
+            if (conf && !confirm(conf)) return;
+            $table{{ table.table_name }}Busy = true;
+            form.requestSubmit(btn);
+          ">
+    Go
+  </button>
+  <div data-show="$table{{ table.table_name }}Error !== ''"
+       class="notification is-warning is-light py-1 px-2 mb-0 is-size-7"
+       data-text="$table{{ table.table_name }}Error">
+  </div>
+  {% if table.empty_selection_message %}
+  <div class="notification is-warning is-light py-1 px-2 mb-0 is-size-7">
+    {{ table.empty_selection_message }}
+  </div>
+  {% endif %}
+</div>
+{% endif %}

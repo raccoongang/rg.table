@@ -11,6 +11,7 @@ rg.table extends [django-tables2](https://django-tables2.readthedocs.io/) to pro
 - **User column selection** with session persistence
 - **Named profiles** with database persistence for authenticated users
 - **Per-page selection** with session persistence
+- **Row selection & bulk actions** (delete, export CSV/XLSX, custom handlers)
 - Clean, consistent API
 
 ## Installation
@@ -110,6 +111,26 @@ class Meta(TableMeta):
     enable_column_selection = True
     enable_profiles = True
     enable_per_page_selection = True
+```
+
+### Row Selection & Actions
+
+Add bulk actions with row checkboxes:
+
+```python
+from rg.table import TableAction
+from rg.table.export import ExportMixin
+
+class Meta(TableMeta):
+    template_kit = "bootstrap"
+    actions = (
+        TableAction("delete", "Delete selected", delete_handler,
+                    confirm="Delete selected rows?"),
+    )
+
+# Or use ExportMixin for CSV/XLSX export:
+class MyTable(ExportMixin, Table):
+    ...
 ```
 
 ### Per-Page Selection

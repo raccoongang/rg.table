@@ -1,3 +1,4 @@
+import json
 from typing import Any
 
 from django.core.paginator import EmptyPage, PageNotAnInteger
@@ -14,6 +15,10 @@ PROFILE_ID_PARAM = "_profile_id"
 PROFILE_NAME_PARAM = "_profile_name"
 PER_PAGE_SUBMIT_PARAM = "_per_page_submit"
 PER_PAGE_VALUE_PARAM = "_per_page"
+SELECT_ALL_PARAM = "_select_all"
+ACTION_SUBMIT_PARAM = "_action_submit"
+ACTION_PARAM = "_action"
+SELECTION_PARAM = "_selected"
 
 
 def _session_key(table_name: str) -> str:
@@ -173,7 +178,11 @@ class RequestConfig:
             if getattr(table, "enable_per_page_selection", False):
                 table.current_per_page = table.paginator.per_page
 
-        # 7. Build profile metadata for templates
+        # 7. Build visible row IDs for select-all (needs paginated rows)
+        if getattr(table, "actions", ()) and table.table_name:
+            self._build_visible_ids(table)
+
+        # 8. Build profile metadata for templates
         if getattr(table, "enable_profiles", False) and table.table_name:
             self._build_profile_meta(table)
 
@@ -367,3 +376,22 @@ class RequestConfig:
         table.active_profile = get_active_profile_info(
             self.request.session, table.table_name
         )
+
+    def _build_visible_ids(self, table: Any) -> None:
+        """Compute visible row IDs and action metadata for templates."""
+        field = getattr(table, "row_id_field", "pk")
+        ids: list[str] = []
+        for row in table.paginated_rows:
+            record = row.record
+            if hasattr(record, field):
+                ids.append(str(getattr(record, field)))
+            else:
+                ids.append(str(record[field]))
+        table.visible_ids_json = json.dumps(ids)
+
+        # Build confirm messages map for client-side confirm() dialog
+        confirms: dict[str, str] = {}
+        for action in table.actions:
+            if getattr(action, "confirm", None):
+                confirms[action.name] = action.confirm
+        table.action_confirms_json = json.dumps(confirms)

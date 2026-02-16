@@ -18,6 +18,7 @@ urlpatterns = [
     path("bootstrap/infinite/", views.infinite_table_bootstrap, name="infinite-bootstrap"),
     path("bootstrap/columns/", views.column_select_table_bootstrap, name="columns-bootstrap"),
     path("bootstrap/profiles/", views.profile_table_bootstrap, name="profiles-bootstrap"),
+    path("bootstrap/actions/", views.actions_table_bootstrap, name="actions-bootstrap"),
 
     # Bulma tables
     path("bulma/plain/", views.plain_table_bulma, name="plain-bulma"),
@@ -26,6 +27,7 @@ urlpatterns = [
     path("bulma/infinite/", views.infinite_table_bulma, name="infinite-bulma"),
     path("bulma/columns/", views.column_select_table_bulma, name="columns-bulma"),
     path("bulma/profiles/", views.profile_table_bulma, name="profiles-bulma"),
+    path("bulma/actions/", views.actions_table_bulma, name="actions-bulma"),
 
     # Default redirect to bootstrap
     path("", views.index_redirect, name="index"),

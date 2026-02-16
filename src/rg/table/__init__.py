@@ -14,10 +14,16 @@ from .views import table_render
 if TYPE_CHECKING:
     from .models import TableProfile
 
+from .export import ExportMixin, TableAction, make_csv_export, make_xlsx_export
+
 __all__ = [
     "Table",
     "TableMeta",
     "TableProfile",
+    "TableAction",
+    "ExportMixin",
+    "make_csv_export",
+    "make_xlsx_export",
     "TableMixin",
     "TableListView",
     "DynamicColumn",

@@ -1,13 +1,22 @@
 {% load django_tables2 %}
 {# Bulma table template - base template with blocks #}
-<div id="table_{{ table.table_name }}_inner">
+<div id="table_{{ table.table_name }}_inner"
+     {% if table.actions %}data-signals="{table{{ table.table_name }}SelectAll: false}"{% endif %}>
   {% block toolbar %}
     {% include 'rg_table/bulma/profile_selector.html' %}
     {% include 'rg_table/bulma/columns_selector.html' %}
   {% endblock %}
+  {% if table.actions %}
+  <form method="post" action="{{ request.get_full_path }}">
+    {% csrf_token %}
+    {% include 'rg_table/bulma/action_bar.html' %}
+  {% endif %}
   {% block table %}
     {% include 'rg_table/bulma/table_body.html' %}
   {% endblock %}
+  {% if table.actions %}
+  </form>
+  {% endif %}
   {% block paginator %}
     {% include 'rg_table/bulma/paginator_simple.html' %}
     {% include 'rg_table/bulma/per_page_selector.html' %}

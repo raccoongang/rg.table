@@ -7,6 +7,7 @@ from rg.table import RequestConfig, table_render
 from .filters import GeoNameFilterSet
 from .models import GeoName
 from .tables import (
+    GeoNameActionTable,
     GeoNameFilteredTable,
     GeoNameInfiniteTable,
     GeoNamePlainTable,
@@ -127,6 +128,21 @@ def profile_table_bootstrap(request):
     })
 
 
+def actions_table_bootstrap(request):
+    """Actions table with Bootstrap (row selection, delete, export)."""
+    queryset = GeoName.objects.all()
+    table = GeoNameActionTable(
+        queryset,
+        template_kit="bootstrap",
+        name="actions",
+    )
+    RequestConfig(request, paginate={"per_page": 15}).configure(table)
+    return table_render(request, "geodata/geoname_list_bootstrap.html", {
+        "table": table,
+        "table_variant": "Row Selection & Actions",
+    })
+
+
 # Bulma views
 
 def index_bulma(request):
@@ -231,4 +247,19 @@ def profile_table_bulma(request):
     return table_render(request, "geodata/geoname_list_bulma.html", {
         "table": table,
         "table_variant": "Profiles",
+    })
+
+
+def actions_table_bulma(request):
+    """Actions table with Bulma (row selection, delete, export)."""
+    queryset = GeoName.objects.all()
+    table = GeoNameActionTable(
+        queryset,
+        template_kit="bulma",
+        name="actions",
+    )
+    RequestConfig(request, paginate={"per_page": 15}).configure(table)
+    return table_render(request, "geodata/geoname_list_bulma.html", {
+        "table": table,
+        "table_variant": "Row Selection & Actions",
     })
