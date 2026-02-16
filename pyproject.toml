@@ -63,6 +63,9 @@ select = ["E", "F", "I", "N", "W", "UP", "DJ"]
 python_version = "3.12"
 plugins = ["mypy_django_plugin.main"]
 strict = true
+mypy_path = "src"
+namespace_packages = true
+explicit_package_bases = true
 
 [[tool.mypy.overrides]]
 module = [

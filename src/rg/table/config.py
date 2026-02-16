@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, cast
 
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import HttpRequest
@@ -271,10 +271,12 @@ class RequestConfig:
         if not action:
             return
 
-        user = self.request.user
-        if not user or not getattr(user, "is_authenticated", False):
+        if not getattr(self.request.user, "is_authenticated", False):
             return
 
+        from django.contrib.auth.models import User
+
+        user = cast("User", self.request.user)
         session = self.request.session
         table_name = table.table_name
 
@@ -323,10 +325,12 @@ class RequestConfig:
 
     def _maybe_load_default_profile(self, table: Any) -> None:
         """On first visit (no active profile in session), load default profile."""
-        user = self.request.user
-        if not user or not getattr(user, "is_authenticated", False):
+        if not getattr(self.request.user, "is_authenticated", False):
             return
 
+        from django.contrib.auth.models import User
+
+        user = cast("User", self.request.user)
         session = self.request.session
         table_name = table.table_name
 
@@ -360,14 +364,16 @@ class RequestConfig:
 
     def _build_profile_meta(self, table: Any) -> None:
         """Set table.profiles_list and table.active_profile for template use."""
-        user = self.request.user
-        if not user or not getattr(user, "is_authenticated", False):
+        if not getattr(self.request.user, "is_authenticated", False):
             table.profiles_list = []
             table.active_profile = None
             return
 
+        from django.contrib.auth.models import User
+
         from .profiles import list_profiles
 
+        user = cast("User", self.request.user)
         profiles = list_profiles(user, table.table_name)
         table.profiles_list = [
             {"id": p.pk, "name": p.name, "is_default": p.is_default}
