@@ -1,7 +1,8 @@
 {% load django_tables2 %}
 {# Bootstrap 5 table template - base template with blocks #}
 <div id="table_{{ table.table_name }}_inner">
-  {% block columns_selector %}
+  {% block toolbar %}
+    {% include 'rg_table/bootstrap/profile_selector.html' %}
     {% include 'rg_table/bootstrap/columns_selector.html' %}
   {% endblock %}
   {% block table %}
@@ -9,5 +10,6 @@
   {% endblock %}
   {% block paginator %}
     {% include 'rg_table/bootstrap/paginator_simple.html' %}
+    {% include 'rg_table/bootstrap/per_page_selector.html' %}
   {% endblock %}
 </div>

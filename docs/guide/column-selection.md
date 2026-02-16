@@ -91,16 +91,12 @@ This is useful for pre-populating preferences or building a "reset to defaults" 
 
 The column selector is included automatically in all table templates:
 
-- `table.html` — above the table body (via `{% block columns_selector %}`)
+- `table.html` — in the toolbar block (alongside profile selector)
 - `table_filtered.html` — in the filter bar, right-aligned
 - `table_infinite.html` — inherited from `table.html`
 
 It only renders when `enable_column_selection` is truthy and `all_columns_meta` is populated (i.e. after `RequestConfig.configure()` runs).
 
-## Future: Database Profiles
+## Database Profiles
 
-The session-based approach is designed to extend to database-backed profiles. The planned approach:
-
-1. Create a model storing `(user, table_name, columns, is_default)`.
-2. On login, load the user's default profile into the session.
-3. The session helpers (`get_column_preference` / `set_column_preference`) remain the interface — no changes needed to `RequestConfig` or templates.
+Column selection integrates with the [Profiles](profiles.md) feature. When profiles are enabled, users can save their column selection (along with per-page and sort preferences) to named profiles that persist across sessions in the database. See the [Profiles guide](profiles.md) for details.

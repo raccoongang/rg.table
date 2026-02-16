@@ -9,6 +9,8 @@ rg.table extends [django-tables2](https://django-tables2.readthedocs.io/) to pro
 - **Infinite scroll** pagination
 - Optional **django-filter** integration
 - **User column selection** with session persistence
+- **Named profiles** with database persistence for authenticated users
+- **Per-page selection** with session persistence
 - Clean, consistent API
 
 ## Installation
@@ -96,6 +98,29 @@ class Meta(TableMeta):
     template_kit = "bootstrap"
     enable_column_selection = True
     pinned_columns = ("title",)  # always visible
+```
+
+### Profiles
+
+Save and load named table configurations (columns, per-page, sort):
+
+```python
+class Meta(TableMeta):
+    template_kit = "bootstrap"
+    enable_column_selection = True
+    enable_profiles = True
+    enable_per_page_selection = True
+```
+
+### Per-Page Selection
+
+Let users choose how many rows to display:
+
+```python
+class Meta(TableMeta):
+    template_kit = "bootstrap"
+    enable_per_page_selection = True
+    per_page_choices = (10, 25, 50, 100)
 ```
 
 ## Requirements

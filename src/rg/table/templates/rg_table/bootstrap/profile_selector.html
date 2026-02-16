@@ -1,0 +1,111 @@
+{% if table.enable_profiles and table.table_name and request.user.is_authenticated %}
+<div class="dropdown d-inline-block mb-2"
+     id="profile_sel_{{ table.table_name }}"
+     data-signals:table-{{ table.table_name }}-profile-open="false"
+     data-signals:table-{{ table.table_name }}-profile-save-as="false"
+     data-signals:table-{{ table.table_name }}-profile-name="''"
+     data-class:show="$table{{ table.table_name }}ProfileOpen">
+  <button class="btn btn-outline-secondary btn-sm dropdown-toggle"
+          type="button"
+          aria-expanded="false"
+          data-on:click="$table{{ table.table_name }}ProfileOpen = !$table{{ table.table_name }}ProfileOpen">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+      <path d="M6 1a1 1 0 0 0-1 1v1H3.5A1.5 1.5 0 0 0 2 4.5v9A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 3H11V2a1 1 0 0 0-1-1H6zm5 3H5V2h6v2zM3.5 4H5v.5a.5.5 0 0 0 1 0V4h4v.5a.5.5 0 0 0 1 0V4h1.5a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5z"/>
+    </svg>
+    {% if table.active_profile %}
+      {{ table.active_profile.name }}
+    {% else %}
+      Profiles
+    {% endif %}
+  </button>
+  <div class="dropdown-menu p-2"
+       data-class:show="$table{{ table.table_name }}ProfileOpen"
+       style="min-width: 240px;">
+    {# Profile list - load on click #}
+    {% for profile in table.profiles_list %}
+    <form class="d-inline">
+      {% csrf_token %}
+      <input type="hidden" name="_profile_action" value="load">
+      <input type="hidden" name="_profile_id" value="{{ profile.id }}">
+      <button type="button"
+              class="dropdown-item d-flex align-items-center gap-2 py-1{% if table.active_profile.id == profile.id %} active{% endif %}"
+              data-on:click="$table{{ table.table_name }}ProfileOpen = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
+        {{ profile.name }}
+        {% if profile.is_default %}
+          <span class="badge bg-secondary ms-auto">default</span>
+        {% endif %}
+      </button>
+    </form>
+    {% endfor %}
+
+    {% if table.profiles_list %}
+    <div class="dropdown-divider"></div>
+    {% endif %}
+
+    {# Save active profile #}
+    {% if table.active_profile %}
+    <form class="d-inline">
+      {% csrf_token %}
+      <input type="hidden" name="_profile_action" value="save">
+      <button type="button"
+              class="dropdown-item py-1"
+              data-on:click="@post('{{ request.get_full_path }}', {contentType: 'form'})">
+        Save "{{ table.active_profile.name }}"
+      </button>
+    </form>
+    {% endif %}
+
+    {# Save as - toggle input #}
+    <div class="dropdown-item py-1"
+         data-show="!$table{{ table.table_name }}ProfileSaveAs"
+         style="cursor: pointer;"
+         data-on:click="$table{{ table.table_name }}ProfileSaveAs = true">
+      Save as...
+    </div>
+    <div data-show="$table{{ table.table_name }}ProfileSaveAs"
+         class="px-3 py-1">
+      <form>
+        {% csrf_token %}
+        <input type="hidden" name="_profile_action" value="save_as">
+        <div class="input-group input-group-sm">
+          <input type="text"
+                 class="form-control"
+                 name="_profile_name"
+                 placeholder="Profile name"
+                 data-model="table{{ table.table_name }}ProfileName">
+          <button type="button"
+                  class="btn btn-primary btn-sm"
+                  data-on:click="$table{{ table.table_name }}ProfileOpen = false; $table{{ table.table_name }}ProfileSaveAs = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
+            OK
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {# Set default / Delete active profile #}
+    {% if table.active_profile %}
+    <div class="dropdown-divider"></div>
+    <form class="d-inline">
+      {% csrf_token %}
+      <input type="hidden" name="_profile_action" value="set_default">
+      <input type="hidden" name="_profile_id" value="{{ table.active_profile.id }}">
+      <button type="button"
+              class="dropdown-item py-1"
+              data-on:click="@post('{{ request.get_full_path }}', {contentType: 'form'})">
+        Set as default
+      </button>
+    </form>
+    <form class="d-inline">
+      {% csrf_token %}
+      <input type="hidden" name="_profile_action" value="delete">
+      <input type="hidden" name="_profile_id" value="{{ table.active_profile.id }}">
+      <button type="button"
+              class="dropdown-item py-1 text-danger"
+              data-on:click="$table{{ table.table_name }}ProfileOpen = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
+        Delete "{{ table.active_profile.name }}"
+      </button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

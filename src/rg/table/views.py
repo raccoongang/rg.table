@@ -12,7 +12,15 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
 
-from .config import COLUMN_SELECTION_PARAM, COLUMN_SELECTION_SUBMIT
+from .config import (
+    COLUMN_SELECTION_PARAM,
+    COLUMN_SELECTION_SUBMIT,
+    PER_PAGE_SUBMIT_PARAM,
+    PER_PAGE_VALUE_PARAM,
+    PROFILE_ACTION_PARAM,
+    PROFILE_ID_PARAM,
+    PROFILE_NAME_PARAM,
+)
 
 
 def table_render(
@@ -35,6 +43,11 @@ def table_render(
         query_params.pop("datastar", None)
         query_params.pop(COLUMN_SELECTION_PARAM, None)
         query_params.pop(COLUMN_SELECTION_SUBMIT, None)
+        query_params.pop(PROFILE_ACTION_PARAM, None)
+        query_params.pop(PROFILE_ID_PARAM, None)
+        query_params.pop(PROFILE_NAME_PARAM, None)
+        query_params.pop(PER_PAGE_SUBMIT_PARAM, None)
+        query_params.pop(PER_PAGE_VALUE_PARAM, None)
         current_url = f"{request.path}?{query_params.urlencode()}"
 
         # Update browser URL with current page number using History API

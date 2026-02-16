@@ -1,0 +1,17 @@
+{% if table.enable_per_page_selection and table.per_page_choices %}
+<div class="is-flex is-align-items-center is-justify-content-center mt-2" style="gap: 0.25rem;">
+  <small class="has-text-grey mr-1">Show:</small>
+  {% for choice in table.per_page_choices %}
+  <form class="is-inline">
+    {% csrf_token %}
+    <input type="hidden" name="_per_page_submit" value="1">
+    <input type="hidden" name="_per_page" value="{{ choice }}">
+    <button type="button"
+            class="button is-small {% if table.current_per_page == choice %}is-primary{% else %}is-outlined{% endif %}"
+            data-on:click="@post('{{ request.get_full_path }}', {contentType: 'form'})">
+      {{ choice }}
+    </button>
+  </form>
+  {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,118 @@
+{% if table.enable_profiles and table.table_name and request.user.is_authenticated %}
+<div class="dropdown mb-2"
+     id="profile_sel_{{ table.table_name }}"
+     data-signals:table-{{ table.table_name }}-profile-open="false"
+     data-signals:table-{{ table.table_name }}-profile-save-as="false"
+     data-signals:table-{{ table.table_name }}-profile-name="''"
+     data-class:is-active="$table{{ table.table_name }}ProfileOpen">
+  <div class="dropdown-trigger">
+    <button class="button is-small"
+            type="button"
+            aria-haspopup="true"
+            data-on:click="$table{{ table.table_name }}ProfileOpen = !$table{{ table.table_name }}ProfileOpen">
+      <span>
+        {% if table.active_profile %}
+          {{ table.active_profile.name }}
+        {% else %}
+          Profiles
+        {% endif %}
+      </span>
+      <span class="icon is-small">&#9662;</span>
+    </button>
+  </div>
+  <div class="dropdown-menu" role="menu" style="min-width: 240px;">
+    <div class="dropdown-content py-2">
+      {# Profile list - load on click #}
+      {% for profile in table.profiles_list %}
+      <form class="is-inline">
+        {% csrf_token %}
+        <input type="hidden" name="_profile_action" value="load">
+        <input type="hidden" name="_profile_id" value="{{ profile.id }}">
+        <button type="button"
+                class="dropdown-item is-flex is-align-items-center{% if table.active_profile.id == profile.id %} is-active{% endif %}"
+                style="gap: 0.5rem; cursor: pointer;"
+                data-on:click="$table{{ table.table_name }}ProfileOpen = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
+          {{ profile.name }}
+          {% if profile.is_default %}
+            <span class="tag is-light ml-auto">default</span>
+          {% endif %}
+        </button>
+      </form>
+      {% endfor %}
+
+      {% if table.profiles_list %}
+      <hr class="dropdown-divider">
+      {% endif %}
+
+      {# Save active profile #}
+      {% if table.active_profile %}
+      <form class="is-inline">
+        {% csrf_token %}
+        <input type="hidden" name="_profile_action" value="save">
+        <button type="button"
+                class="dropdown-item"
+                data-on:click="@post('{{ request.get_full_path }}', {contentType: 'form'})">
+          Save "{{ table.active_profile.name }}"
+        </button>
+      </form>
+      {% endif %}
+
+      {# Save as - toggle input #}
+      <div class="dropdown-item"
+           data-show="!$table{{ table.table_name }}ProfileSaveAs"
+           style="cursor: pointer;"
+           data-on:click="$table{{ table.table_name }}ProfileSaveAs = true">
+        Save as...
+      </div>
+      <div data-show="$table{{ table.table_name }}ProfileSaveAs"
+           class="px-3 py-1">
+        <form>
+          {% csrf_token %}
+          <input type="hidden" name="_profile_action" value="save_as">
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input type="text"
+                     class="input is-small"
+                     name="_profile_name"
+                     placeholder="Profile name"
+                     data-model="table{{ table.table_name }}ProfileName">
+            </div>
+            <div class="control">
+              <button type="button"
+                      class="button is-primary is-small"
+                      data-on:click="$table{{ table.table_name }}ProfileOpen = false; $table{{ table.table_name }}ProfileSaveAs = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
+                OK
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {# Set default / Delete active profile #}
+      {% if table.active_profile %}
+      <hr class="dropdown-divider">
+      <form class="is-inline">
+        {% csrf_token %}
+        <input type="hidden" name="_profile_action" value="set_default">
+        <input type="hidden" name="_profile_id" value="{{ table.active_profile.id }}">
+        <button type="button"
+                class="dropdown-item"
+                data-on:click="@post('{{ request.get_full_path }}', {contentType: 'form'})">
+          Set as default
+        </button>
+      </form>
+      <form class="is-inline">
+        {% csrf_token %}
+        <input type="hidden" name="_profile_action" value="delete">
+        <input type="hidden" name="_profile_id" value="{{ table.active_profile.id }}">
+        <button type="button"
+                class="dropdown-item has-text-danger"
+                data-on:click="$table{{ table.table_name }}ProfileOpen = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
+          Delete "{{ table.active_profile.name }}"
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}

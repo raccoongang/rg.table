@@ -62,5 +62,17 @@ class GeoNameInfiniteTable(GeoNameTableBase):
         infinite_scroll = True
 
 
+class GeoNameProfileTable(GeoNameTableBase):
+    """Table with profiles, column selection, and per-page selection enabled."""
+
+    class Meta(GeoNameTableBase.Meta):
+        orderable = True
+        enable_column_selection = True
+        enable_profiles = True
+        enable_per_page_selection = True
+        per_page_choices = (10, 15, 25, 50)
+        pinned_columns = ("name",)
+
+
 # Alias for backwards compatibility
 GeoNameTable = GeoNamePlainTable

@@ -10,6 +10,7 @@ from .tables import (
     GeoNameFilteredTable,
     GeoNameInfiniteTable,
     GeoNamePlainTable,
+    GeoNameProfileTable,
     GeoNameSortableTable,
 )
 
@@ -111,6 +112,21 @@ def column_select_table_bootstrap(request):
     })
 
 
+def profile_table_bootstrap(request):
+    """Profile table with Bootstrap."""
+    queryset = GeoName.objects.all()
+    table = GeoNameProfileTable(
+        queryset,
+        template_kit="bootstrap",
+        name="profiles",
+    )
+    RequestConfig(request, paginate={"per_page": 15}).configure(table)
+    return table_render(request, "geodata/geoname_list_bootstrap.html", {
+        "table": table,
+        "table_variant": "Profiles",
+    })
+
+
 # Bulma views
 
 def index_bulma(request):
@@ -200,4 +216,19 @@ def column_select_table_bulma(request):
     return table_render(request, "geodata/geoname_list_bulma.html", {
         "table": table,
         "table_variant": "Column Selection",
+    })
+
+
+def profile_table_bulma(request):
+    """Profile table with Bulma."""
+    queryset = GeoName.objects.all()
+    table = GeoNameProfileTable(
+        queryset,
+        template_kit="bulma",
+        name="profiles",
+    )
+    RequestConfig(request, paginate={"per_page": 15}).configure(table)
+    return table_render(request, "geodata/geoname_list_bulma.html", {
+        "table": table,
+        "table_variant": "Profiles",
     })

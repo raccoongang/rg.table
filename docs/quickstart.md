@@ -153,6 +153,51 @@ RequestConfig(request, paginate={"per_page": 25}).configure(table)
 
 Preferences are stored in the Django session and applied automatically on each request.
 
+## Enable Profiles
+
+Save and load named table configurations for authenticated users:
+
+```python
+class BookTable(Table):
+    title = tables.Column()
+    author = tables.Column()
+    published = tables.DateColumn()
+    price = tables.Column()
+
+    class Meta(TableMeta):
+        model = Book
+        template_kit = "bootstrap"
+        enable_column_selection = True
+        enable_profiles = True
+        enable_per_page_selection = True
+        pinned_columns = ("title",)
+```
+
+Run migrations to create the profiles table:
+
+```bash
+python manage.py migrate rg_table
+```
+
+The profile selector dropdown appears automatically. Authenticated users can save, load, and switch between different table views. See the [Profiles guide](guide/profiles.md) for full details.
+
+## Enable Per-Page Selection
+
+Let users choose how many rows to display:
+
+```python
+class BookTable(Table):
+    # ... columns ...
+
+    class Meta(TableMeta):
+        model = Book
+        template_kit = "bootstrap"
+        enable_per_page_selection = True
+        per_page_choices = (10, 25, 50, 100)
+```
+
+A button group appears below the paginator. The selected per-page value is stored in the session.
+
 ## Enable Infinite Scroll
 
 ```python

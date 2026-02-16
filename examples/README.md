@@ -47,8 +47,18 @@ The geodata app demonstrates:
 2. **Sortable Table** - Table with column sorting
 3. **Filtered Table** - Table with django-filter integration
 4. **Infinite Scroll** - Table with Datastar-powered infinite scrolling
+5. **Column Selection** - User-selectable columns with session persistence
+6. **Profiles** - Named profiles with DB persistence, per-page selection
 
 Both Bootstrap and Bulma template kits are available.
+
+To use profiles, create a user account:
+
+```bash
+python manage.py createsuperuser
+```
+
+Then log in via `/admin/` before visiting the profiles demo.
 
 ## Project Structure
 

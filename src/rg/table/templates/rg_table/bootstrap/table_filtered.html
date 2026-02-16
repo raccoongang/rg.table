@@ -15,8 +15,9 @@
       <div class="col-md-auto">
         {% include 'rg_table/bootstrap/filters/clear.html' %}
       </div>
-      {% if table.enable_column_selection %}
-      <div class="col-md-auto ms-auto">
+      {% if table.enable_profiles or table.enable_column_selection %}
+      <div class="col-md-auto ms-auto d-flex gap-2">
+        {% include 'rg_table/bootstrap/profile_selector.html' %}
         {% include 'rg_table/bootstrap/columns_selector.html' %}
       </div>
       {% endif %}
@@ -26,4 +27,5 @@
   {# Table #}
   {% include 'rg_table/bootstrap/table_body.html' %}
   {% include 'rg_table/bootstrap/paginator_simple.html' %}
+  {% include 'rg_table/bootstrap/per_page_selector.html' %}
 </div>

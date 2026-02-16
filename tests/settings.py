@@ -6,8 +6,13 @@ DEBUG = True
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
+    "django.contrib.sessions",
     "django_tables2",
     "rg.table",
+]
+
+MIDDLEWARE = [
+    "django.contrib.sessions.middleware.SessionMiddleware",
 ]
 
 DATABASES = {
