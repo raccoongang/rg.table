@@ -126,6 +126,33 @@ class BookTable(Table):
         filterset_class = BookFilterSet
 ```
 
+## Enable Column Selection
+
+Let users show/hide columns via a dropdown:
+
+```python
+class BookTable(Table):
+    title = tables.Column()
+    author = tables.Column()
+    published = tables.DateColumn()
+    price = tables.Column()
+
+    class Meta(TableMeta):
+        model = Book
+        template_kit = "bootstrap"
+        enable_column_selection = True
+        pinned_columns = ("title",)  # optional: cannot be hidden
+```
+
+The table must have a `name` when instantiated:
+
+```python
+table = BookTable(queryset, name="books")
+RequestConfig(request, paginate={"per_page": 25}).configure(table)
+```
+
+Preferences are stored in the Django session and applied automatically on each request.
+
 ## Enable Infinite Scroll
 
 ```python

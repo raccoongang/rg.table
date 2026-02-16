@@ -8,6 +8,7 @@ rg.table extends [django-tables2](https://django-tables2.readthedocs.io/) to pro
 - **Datastar** integration for reactive/dynamic tables
 - **Infinite scroll** pagination
 - Optional **django-filter** integration
+- **User column selection** with session persistence
 - Clean, consistent API
 
 ## Installation
@@ -84,6 +85,17 @@ Integrate with django-filter:
 class Meta(TableMeta):
     template_kit = "bootstrap"
     filterset_class = BookFilterSet
+```
+
+### Column Selection
+
+Let users choose which columns to display:
+
+```python
+class Meta(TableMeta):
+    template_kit = "bootstrap"
+    enable_column_selection = True
+    pinned_columns = ("title",)  # always visible
 ```
 
 ## Requirements

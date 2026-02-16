@@ -30,6 +30,7 @@ Each kit provides these templates:
 
 - `rg_table/{kit}/table.html` - Main table template
 - `rg_table/{kit}/table_body.html` - Table body (rows)
+- `rg_table/{kit}/columns_selector.html` - Column selection dropdown
 - `rg_table/{kit}/paginator_simple.html` - Standard pagination
 - `rg_table/{kit}/paginator_infinite.html` - Infinite scroll pagination
 - `rg_table/{kit}/table_filtered.html` - Table with filter form

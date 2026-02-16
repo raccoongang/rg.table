@@ -42,6 +42,10 @@ Table with django-filter integration showing search and dropdown filters.
 
 Datastar-powered infinite scrolling that loads more rows as you scroll.
 
+### Column Selection
+
+Sortable table with a "Columns" dropdown that lets users show/hide columns. Preferences persist in the session across page loads.
+
 ## Template Kits
 
 Each demo is available in both Bootstrap 5 and Bulma versions to showcase the different styling options.
