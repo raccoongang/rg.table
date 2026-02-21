@@ -82,7 +82,9 @@ def table_render(
 
         # Build URL with current page number (preserves filter params from request.GET)
         query_params = request.GET.copy()
-        query_params["page"] = table.page.number
+        page = getattr(table, "page", None)
+        if page is not None:
+            query_params["page"] = page.number
         query_params.pop("datastar", None)
         query_params.pop(COLUMN_SELECTION_PARAM, None)
         query_params.pop(COLUMN_SELECTION_SUBMIT, None)
