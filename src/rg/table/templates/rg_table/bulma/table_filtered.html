@@ -1,7 +1,7 @@
 {% load django_tables2 %}
 {# Bulma filtered table template #}
 <div id="table_{{ table.table_name }}_inner"
-     {% if table.actions %}data-signals:table-{{ table.table_name }}-selected="[]"{% endif %}>
+     {% if table.actions %}data-signals="{table{{ table.table_name }}SelectAll: false}"{% endif %}>
   {# Filter bar #}
   <form id="table_{{ table.table_name }}_form" name="table_{{ table.table_name }}_form">
     <div class="field is-grouped is-grouped-multiline mb-4">
