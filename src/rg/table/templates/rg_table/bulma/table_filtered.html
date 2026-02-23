@@ -16,14 +16,11 @@
       <div class="control">
         {% include 'rg_table/bulma/filters/clear.html' %}
       </div>
-      {% if table.enable_profiles or table.enable_column_selection %}
-      <div class="control ml-auto is-flex" style="gap: 0.5rem;">
-        {% include 'rg_table/bulma/profile_selector.html' %}
-        {% include 'rg_table/bulma/columns_selector.html' %}
-      </div>
-      {% endif %}
     </div>
   </form>
+
+  {% include 'rg_table/bulma/profile_selector.html' %}
+  {% include 'rg_table/bulma/columns_selector.html' %}
 
   {# Table #}
   {% if table.actions %}
