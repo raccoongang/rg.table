@@ -368,36 +368,19 @@ class TestActionDispatch:
         response = table_render(request, "test.html", {"table": table})
         assert response is csv_response
 
-    def test_requires_selection_skips_empty(self, rf):
+    def test_empty_selection_runs_handler(self, rf):
+        """No selection means 'whole dataset' — handler receives empty list."""
         handler = MagicMock(return_value=None)
-        action = TableAction("test", "Test", handler, requires_selection=True)
+        action = TableAction("test", "Test", handler)
         table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
         request = _make_request(
             rf,
             post_params={ACTION_SUBMIT_PARAM: "1", ACTION_PARAM: "test"},
         )
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
-        response = table_render(
-            request,
-            "rg_table/bootstrap/table.html",
-            {"table": table, "request": request},
-        )
-        handler.assert_not_called()
-        # Renders page with empty selection message instead of redirecting
-        assert response.status_code == 200
-        assert table.empty_selection_message is not None
-
-    def test_requires_selection_false_runs_empty(self, rf):
-        handler = MagicMock(return_value=None)
-        action = TableAction("test", "Test", handler, requires_selection=False)
-        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
-        request = _make_request(
-            rf,
-            post_params={ACTION_SUBMIT_PARAM: "1", ACTION_PARAM: "test"},
-        )
-        RequestConfig(request, paginate={"per_page": 25}).configure(table)
-        table_render(request, "test.html", {"table": table})
+        response = table_render(request, "test.html", {"table": table})
         handler.assert_called_once_with(request, table, [])
+        assert response.status_code == 302
 
     def test_unknown_action_redirects(self, rf):
         table = ActionTable(SAMPLE_DATA, name="test")
@@ -442,6 +425,185 @@ class TestSelectionClearing:
         # (the signal name will appear in template HTML via data-model, but
         #  there should be no datastar-patch-signals event clearing it)
         assert "datastar-patch-signals" not in content
+
+
+# --- Datastar action dispatch ---
+
+
+class TestDatastarActionDispatch:
+    def test_datastar_action_success_sse(self, rf):
+        """Successful Datastar action returns SSE re-rendering the table."""
+        handler = MagicMock(return_value=None)
+        action = TableAction("test", "Test", handler)
+        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
+        request = _make_request(
+            rf,
+            post_params={
+                ACTION_SUBMIT_PARAM: "1",
+                ACTION_PARAM: "test",
+                SELECTION_PARAM: ["1", "3"],
+            },
+            datastar=True,
+        )
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = table_render(
+            request,
+            "rg_table/bootstrap/table.html",
+            {"table": table, "request": request},
+        )
+        handler.assert_called_once_with(request, table, ["1", "3"])
+        assert response.streaming is True
+        content = b"".join(response.streaming_content).decode()
+        # Should contain SSE patch-elements event
+        assert "datastar-patch-elements" in content
+
+    def test_datastar_empty_selection_no_confirm_runs(self, rf):
+        """Empty selection with no confirm runs handler directly."""
+        handler = MagicMock(return_value=None)
+        action = TableAction("exp", "Export", handler, requires_selection=False)
+        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
+        request = _make_request(
+            rf,
+            post_params={ACTION_SUBMIT_PARAM: "1", ACTION_PARAM: "exp"},
+            datastar=True,
+        )
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = table_render(
+            request,
+            "rg_table/bootstrap/table.html",
+            {"table": table, "request": request},
+        )
+        handler.assert_called_once_with(request, table, [])
+        assert response.streaming is True
+
+    def test_datastar_empty_selection_with_confirm_shows_total(self, rf):
+        """Empty selection + confirm → confirmation with total count."""
+        handler = MagicMock(return_value=None)
+        action = TableAction(
+            "del", "Delete", handler, confirm="Are you sure?"
+        )
+        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
+        request = _make_request(
+            rf,
+            post_params={ACTION_SUBMIT_PARAM: "1", ACTION_PARAM: "del"},
+            datastar=True,
+        )
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = table_render(
+            request,
+            "rg_table/bootstrap/table.html",
+            {"table": table, "request": request},
+        )
+        handler.assert_not_called()
+        content = b"".join(response.streaming_content).decode()
+        assert "all 5 records" in content
+        assert "Are you sure?" in content
+
+    def test_datastar_confirm_sse(self, rf):
+        """Confirmed action without _confirmed returns SSE with confirm UI."""
+        handler = MagicMock(return_value=None)
+        action = TableAction(
+            "del", "Delete", handler, requires_selection=True, confirm="Sure?"
+        )
+        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
+        request = _make_request(
+            rf,
+            post_params={
+                ACTION_SUBMIT_PARAM: "1",
+                ACTION_PARAM: "del",
+                SELECTION_PARAM: ["1", "3"],
+            },
+            datastar=True,
+        )
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = table_render(
+            request,
+            "rg_table/bootstrap/table.html",
+            {"table": table, "request": request},
+        )
+        handler.assert_not_called()
+        content = b"".join(response.streaming_content).decode()
+        assert "Sure?" in content
+        assert "Confirm" in content
+        assert "Cancel" in content
+        assert "action_bar_test" in content
+
+    def test_datastar_confirmed_action_executes(self, rf):
+        """Action with _confirmed in POST executes the handler."""
+        handler = MagicMock(return_value=None)
+        action = TableAction(
+            "del", "Delete", handler, requires_selection=True, confirm="Sure?"
+        )
+        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
+        request = _make_request(
+            rf,
+            post_params={
+                ACTION_SUBMIT_PARAM: "1",
+                ACTION_PARAM: "del",
+                SELECTION_PARAM: ["1", "3"],
+                "_confirmed": "1",
+            },
+            datastar=True,
+        )
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = table_render(
+            request,
+            "rg_table/bootstrap/table.html",
+            {"table": table, "request": request},
+        )
+        handler.assert_called_once_with(request, table, ["1", "3"])
+        assert response.streaming is True
+
+    def test_datastar_download_sse(self, rf):
+        """Download action on Datastar returns SSE with execute_script."""
+        csv_response = HttpResponse("data", content_type="text/csv")
+        csv_response["Content-Disposition"] = 'attachment; filename="test.csv"'
+
+        def download_handler(request, table, selected_pks):
+            return csv_response
+
+        action = TableAction("dl", "Download", download_handler)
+        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
+        request = _make_request(
+            rf,
+            post_params={
+                ACTION_SUBMIT_PARAM: "1",
+                ACTION_PARAM: "dl",
+                SELECTION_PARAM: ["1"],
+            },
+            datastar=True,
+        )
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = table_render(
+            request,
+            "rg_table/bootstrap/table.html",
+            {"table": table, "request": request},
+        )
+        assert response.streaming is True
+        content = b"".join(response.streaming_content).decode()
+        # Should create blob download via execute_script
+        assert "atob(" in content
+        assert "Blob(" in content
+        assert "test.csv" in content
+
+    def test_datastar_unknown_action_rerenders(self, rf):
+        """Unknown action on Datastar re-renders the table."""
+        table = ActionTable(SAMPLE_DATA, name="test")
+        request = _make_request(
+            rf,
+            post_params={
+                ACTION_SUBMIT_PARAM: "1",
+                ACTION_PARAM: "nonexistent",
+            },
+            datastar=True,
+        )
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = table_render(
+            request,
+            "rg_table/bootstrap/table.html",
+            {"table": table, "request": request},
+        )
+        assert response.streaming is True
 
 
 # --- CSV export ---
@@ -573,47 +735,12 @@ class TestConfirmField:
         assert table.action_confirms_json == "{}"
 
 
-# --- Empty selection guard ---
+# --- Selection semantics ---
 
 
-class TestEmptySelectionGuard:
-    def test_empty_selection_renders_message(self, rf):
-        handler = MagicMock(return_value=None)
-        action = TableAction("del", "Delete", handler, requires_selection=True)
-        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
-        request = _make_request(
-            rf,
-            post_params={ACTION_SUBMIT_PARAM: "1", ACTION_PARAM: "del"},
-        )
-        RequestConfig(request, paginate={"per_page": 25}).configure(table)
-        response = table_render(
-            request,
-            "rg_table/bootstrap/table.html",
-            {"table": table, "request": request},
-        )
-        handler.assert_not_called()
-        assert response.status_code == 200
-        assert table.empty_selection_message is not None
-
-    def test_no_message_when_selection_present(self, rf):
-        handler = MagicMock(return_value=None)
-        action = TableAction("del", "Delete", handler, requires_selection=True)
-        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
-        request = _make_request(
-            rf,
-            post_params={
-                ACTION_SUBMIT_PARAM: "1",
-                ACTION_PARAM: "del",
-                SELECTION_PARAM: ["1"],
-            },
-        )
-        RequestConfig(request, paginate={"per_page": 25}).configure(table)
-        response = table_render(request, "test.html", {"table": table})
-        handler.assert_called_once()
-        assert response.status_code == 302
-        assert table.empty_selection_message is None
-
-    def test_no_message_for_requires_selection_false(self, rf):
+class TestSelectionSemantics:
+    def test_empty_selection_runs_handler_with_empty_list(self, rf):
+        """No selection = whole dataset. Handler receives []."""
         handler = MagicMock(return_value=None)
         action = TableAction("exp", "Export", handler, requires_selection=False)
         table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
@@ -623,42 +750,11 @@ class TestEmptySelectionGuard:
         )
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
         table_render(request, "test.html", {"table": table})
-        handler.assert_called_once()
-        assert table.empty_selection_message is None
+        handler.assert_called_once_with(request, table, [])
 
-    def test_bulk_delete_guard_blocks_all_visible(self, rf):
-        """Confirmed action on all visible rows is blocked."""
+    def test_partial_selection_runs_handler(self, rf):
         handler = MagicMock(return_value=None)
-        action = TableAction(
-            "del", "Delete", handler,
-            requires_selection=True, confirm="Sure?",
-        )
-        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
-        request = _make_request(
-            rf,
-            post_params={
-                ACTION_SUBMIT_PARAM: "1",
-                ACTION_PARAM: "del",
-                SELECTION_PARAM: ["1", "2", "3", "4", "5"],
-            },
-        )
-        RequestConfig(request, paginate={"per_page": 25}).configure(table)
-        response = table_render(
-            request,
-            "rg_table/bootstrap/table.html",
-            {"table": table, "request": request},
-        )
-        handler.assert_not_called()
-        assert response.status_code == 200
-        assert "Bulk operation" in table.empty_selection_message
-
-    def test_bulk_guard_allows_partial_selection(self, rf):
-        """Confirmed action on a subset of visible rows is allowed."""
-        handler = MagicMock(return_value=None)
-        action = TableAction(
-            "del", "Delete", handler,
-            requires_selection=True, confirm="Sure?",
-        )
+        action = TableAction("del", "Delete", handler, confirm="Sure?")
         table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
         request = _make_request(
             rf,
@@ -669,33 +765,38 @@ class TestEmptySelectionGuard:
             },
         )
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        # Non-Datastar: confirm is skipped (no JS), handler runs directly
         response = table_render(request, "test.html", {"table": table})
-        handler.assert_called_once()
+        handler.assert_called_once_with(request, table, ["1", "3"])
         assert response.status_code == 302
 
-    def test_bulk_guard_skipped_without_confirm(self, rf):
-        """Actions without confirm field are not guarded."""
+    def test_all_visible_selected_runs_handler(self, rf):
+        """All rows on the page selected — still runs (not blocked)."""
         handler = MagicMock(return_value=None)
-        action = TableAction("exp", "Export", handler, requires_selection=False)
+        action = TableAction("del", "Delete", handler, confirm="Sure?")
         table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
         request = _make_request(
             rf,
             post_params={
                 ACTION_SUBMIT_PARAM: "1",
-                ACTION_PARAM: "exp",
+                ACTION_PARAM: "del",
                 SELECTION_PARAM: ["1", "2", "3", "4", "5"],
             },
         )
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
-        table_render(request, "test.html", {"table": table})
+        response = table_render(request, "test.html", {"table": table})
         handler.assert_called_once()
+        assert response.status_code == 302
 
-    def test_empty_selection_message_in_template(self, rf):
-        action = TableAction("del", "Delete", _noop_handler, requires_selection=True)
+    def test_confirm_action_no_selection_datastar_shows_total_count(self, rf):
+        """Confirmed action with no selection shows count of all records."""
+        handler = MagicMock(return_value=None)
+        action = TableAction("del", "Delete", handler, confirm="Are you sure?")
         table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
         request = _make_request(
             rf,
             post_params={ACTION_SUBMIT_PARAM: "1", ACTION_PARAM: "del"},
+            datastar=True,
         )
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
         response = table_render(
@@ -703,10 +804,40 @@ class TestEmptySelectionGuard:
             "rg_table/bootstrap/table.html",
             {"table": table, "request": request},
         )
-        assert "No rows selected" in response.content.decode()
+        handler.assert_not_called()
+        content = b"".join(response.streaming_content).decode()
+        assert "all 5 records" in content
+        assert "Are you sure?" in content
+
+    def test_confirm_action_with_selection_shows_action_confirm(self, rf):
+        """Confirmed action with selection shows the action's confirm message."""
+        handler = MagicMock(return_value=None)
+        action = TableAction("del", "Delete", handler, confirm="Are you sure?")
+        table = ActionTable(SAMPLE_DATA, name="test", actions=(action,))
+        request = _make_request(
+            rf,
+            post_params={
+                ACTION_SUBMIT_PARAM: "1",
+                ACTION_PARAM: "del",
+                SELECTION_PARAM: ["1", "3"],
+            },
+            datastar=True,
+        )
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = table_render(
+            request,
+            "rg_table/bootstrap/table.html",
+            {"table": table, "request": request},
+        )
+        handler.assert_not_called()
+        content = b"".join(response.streaming_content).decode()
+        assert "Are you sure?" in content
+        assert "2 records selected" in content
+        # Should NOT contain the "all N records" prefix
+        assert "all 5 records" not in content
 
 
-# --- Busy signal and confirms in template ---
+# --- Action bar template signals ---
 
 
 class TestActionBarSignals:
@@ -719,21 +850,29 @@ class TestActionBarSignals:
             request,
         )
 
-    def test_busy_signal_declared(self, rf):
+    def test_no_inline_js(self, rf):
+        """Action bar should not contain imperative JS (confirm, requestSubmit, etc.)."""
         table = ActionTable(SAMPLE_DATA, name="test")
         html = self._render(table, rf)
-        assert "tabletestBusy: false" in html
+        assert "requestSubmit" not in html
+        assert "confirm(" not in html
+        assert "setTimeout" not in html
 
-    def test_confirms_signal_declared(self, rf):
+    def test_go_button_uses_datastar_post(self, rf):
         table = ActionTable(SAMPLE_DATA, name="test")
         html = self._render(table, rf)
-        assert "tabletestConfirms:" in html
+        assert "@post(" in html
 
-    def test_go_button_has_click_prevent(self, rf):
+    def test_action_bar_has_id(self, rf):
         table = ActionTable(SAMPLE_DATA, name="test")
         html = self._render(table, rf)
-        assert "data-on:click__prevent" in html
-        assert "requestSubmit" in html
+        assert 'id="action_bar_test"' in html
+
+    def test_action_submit_hidden_input(self, rf):
+        table = ActionTable(SAMPLE_DATA, name="test")
+        html = self._render(table, rf)
+        assert 'name="_action_submit"' in html
+        assert 'value="1"' in html
 
 
 # --- Template tag: row_id ---
