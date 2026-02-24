@@ -61,7 +61,7 @@ def make_csv_export(filename: str = "export.csv") -> Callable[..., HttpResponse]
         for row in table.rows:
             rid = str(_get_row_id(table, row))
             if not selected_set or rid in selected_set:
-                writer.writerow([row.get_cell(col.name) for col in table.columns])
+                writer.writerow([row.get_cell_value(col.name) for col in table.columns])
         return response
 
     return handler
@@ -94,7 +94,7 @@ def make_xlsx_export(filename: str = "export.xlsx") -> Callable[..., HttpRespons
             rid = str(_get_row_id(table, row))
             if not selected_set or rid in selected_set:
                 for col_idx, col in enumerate(table.columns):
-                    ws.write(row_idx, col_idx, row.get_cell(col.name))
+                    ws.write(row_idx, col_idx, row.get_cell_value(col.name))
                 row_idx += 1
 
         for col_idx, header in enumerate(headers):
