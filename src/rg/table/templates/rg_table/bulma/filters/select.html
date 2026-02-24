@@ -1,3 +1,13 @@
+{% if filter_field.field.widget.input_type == "date" %}
+<input type="date"
+       class="input"
+       name="{{ filter_name }}"
+       data-bind="{{ filter_name }}"
+       value="{{ filter_field.value|default:'' }}"
+       placeholder="{{ filter_field.label }}"
+       title="{{ filter_field.label }}"
+       data-on:change="@get('{{ request.path }}', {contentType: 'form'})">
+{% else %}
 <div class="select">
   <select name="{{ filter_name }}"
           data-bind="{{ filter_name }}"
@@ -10,3 +20,4 @@
     {% endfor %}
   </select>
 </div>
+{% endif %}
