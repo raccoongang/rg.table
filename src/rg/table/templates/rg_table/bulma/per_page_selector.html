@@ -1,6 +1,7 @@
+{% load i18n %}
 {% if table.enable_per_page_selection and table.per_page_choices %}
 <div class="is-flex is-align-items-center is-justify-content-center mt-2" style="gap: 0.25rem;">
-  <small class="has-text-grey mr-1">Show:</small>
+  <small class="has-text-grey mr-1">{% trans "Show:" %}</small>
   {% for choice in table.per_page_choices %}
   <form class="is-inline">
     {% csrf_token %}

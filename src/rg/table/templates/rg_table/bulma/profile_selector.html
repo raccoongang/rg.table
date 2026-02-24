@@ -1,3 +1,4 @@
+{% load i18n %}
 {% if table.enable_profiles and table.table_name and request.user.is_authenticated %}
 <div class="dropdown mb-2"
      id="profile_sel_{{ table.table_name }}"
@@ -14,7 +15,7 @@
         {% if table.active_profile %}
           {{ table.active_profile.name }}
         {% else %}
-          Profiles
+          {% trans "Profiles" %}
         {% endif %}
       </span>
       <span class="icon is-small">&#9662;</span>
@@ -34,7 +35,7 @@
                 data-on:click="$table{{ table.table_name }}ProfileOpen = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
           {{ profile.name }}
           {% if profile.is_default %}
-            <span class="tag is-light ml-auto">default</span>
+            <span class="tag is-light ml-auto">{% trans "default" %}</span>
           {% endif %}
         </button>
       </form>
@@ -52,7 +53,7 @@
         <button type="button"
                 class="dropdown-item"
                 data-on:click="@post('{{ request.get_full_path }}', {contentType: 'form'})">
-          Save "{{ table.active_profile.name }}"
+          {% blocktrans with name=table.active_profile.name %}Save "{{ name }}"{% endblocktrans %}
         </button>
       </form>
       {% endif %}
@@ -62,7 +63,7 @@
            data-show="!$table{{ table.table_name }}ProfileSaveAs"
            style="cursor: pointer;"
            data-on:click="$table{{ table.table_name }}ProfileSaveAs = true">
-        Save as...
+        {% trans "Save as..." %}
       </div>
       <div data-show="$table{{ table.table_name }}ProfileSaveAs"
            class="px-3 py-1">
@@ -74,14 +75,14 @@
               <input type="text"
                      class="input is-small"
                      name="_profile_name"
-                     placeholder="Profile name"
+                     placeholder="{% trans "Profile name" %}"
                      data-model="table{{ table.table_name }}ProfileName">
             </div>
             <div class="control">
               <button type="button"
                       class="button is-primary is-small"
                       data-on:click="$table{{ table.table_name }}ProfileOpen = false; $table{{ table.table_name }}ProfileSaveAs = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
-                OK
+                {% trans "OK" %}
               </button>
             </div>
           </div>
@@ -98,7 +99,7 @@
         <button type="button"
                 class="dropdown-item"
                 data-on:click="@post('{{ request.get_full_path }}', {contentType: 'form'})">
-          Set as default
+          {% trans "Set as default" %}
         </button>
       </form>
       <form class="is-inline">
@@ -108,7 +109,7 @@
         <button type="button"
                 class="dropdown-item has-text-danger"
                 data-on:click="$table{{ table.table_name }}ProfileOpen = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
-          Delete "{{ table.active_profile.name }}"
+          {% blocktrans with name=table.active_profile.name %}Delete "{{ name }}"{% endblocktrans %}
         </button>
       </form>
       {% endif %}

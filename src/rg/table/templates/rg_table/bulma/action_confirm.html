@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="action_bar_{{ table_name }}" class="is-flex is-align-items-center mb-2" style="gap: 0.5rem;">
   <input type="hidden" name="_action_submit" value="1">
   <input type="hidden" name="_action" value="{{ action_name }}">
@@ -5,10 +6,10 @@
   <span class="has-text-warning has-text-weight-bold">{{ confirm_message }}</span>
   <button type="button" class="button is-danger is-small"
           data-on:click="@post('{{ url }}', {contentType: 'form'})">
-    Confirm
+    {% trans "Confirm" %}
   </button>
   <button type="button" class="button is-small"
           data-on:click="@get('{{ url }}')">
-    Cancel
+    {% trans "Cancel" %}
   </button>
 </div>

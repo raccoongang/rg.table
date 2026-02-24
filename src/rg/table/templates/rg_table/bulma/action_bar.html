@@ -1,3 +1,4 @@
+{% load i18n %}
 {% if table.actions %}
 <div id="action_bar_{{ table.table_name }}" class="is-flex is-align-items-center mb-2" style="gap: 0.5rem;"
      data-signals="{table{{ table.table_name }}ActionBusy: false}">
@@ -5,7 +6,7 @@
     <input type="checkbox"
            data-attr:checked="$table{{ table.table_name }}SelectAll"
            data-on:click="$table{{ table.table_name }}SelectAll = !$table{{ table.table_name }}SelectAll">
-    Select all
+    {% trans "Select all" %}
   </label>
   <input type="hidden" name="_action_submit" value="1">
   <div class="select is-small">
@@ -20,7 +21,7 @@
           data-class:is-loading="$table{{ table.table_name }}ActionBusy"
           data-attr:disabled="$table{{ table.table_name }}ActionBusy"
           data-on:click="$table{{ table.table_name }}ActionBusy = true; @post('{{ request.get_full_path }}', {contentType: 'form'})">
-    Go
+    {% trans "Go" %}
   </button>
   {% if table.empty_selection_message %}
   <div class="notification is-warning is-light py-1 px-2 mb-0 is-size-7">

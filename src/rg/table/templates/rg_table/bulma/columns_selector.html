@@ -1,3 +1,4 @@
+{% load i18n %}
 {% if table.enable_column_selection and table.all_columns_meta %}
 <div class="dropdown mb-2"
      id="col_sel_{{ table.table_name }}"
@@ -8,7 +9,7 @@
             type="button"
             aria-haspopup="true"
             data-on:click="$table{{ table.table_name }}ColSelOpen = !$table{{ table.table_name }}ColSelOpen">
-      <span>Columns</span>
+      <span>{% trans "Columns" %}</span>
       <span class="icon is-small">&#9662;</span>
     </button>
   </div>
@@ -34,7 +35,7 @@
           <button type="button"
                   class="button is-primary is-small is-fullwidth"
                   data-on:click="$table{{ table.table_name }}ColSelOpen = false; @post('{{ request.get_full_path }}', {contentType: 'form'})">
-            Apply
+            {% trans "Apply" %}
           </button>
         </div>
       </form>

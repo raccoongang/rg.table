@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="input-group">
   <span class="input-group-text">
     {# Search icon - hidden when loading #}
@@ -6,12 +7,12 @@
     </svg>
     {# Loading spinner - shown when fetching #}
     <span data-show="$fetching" class="spinner-border spinner-border-sm" role="status">
-      <span class="visually-hidden">Loading...</span>
+      <span class="visually-hidden">{% trans "Loading..." %}</span>
     </span>
   </span>
   <input type="text"
          class="form-control"
-         placeholder="Search..."
+         placeholder="{% trans "Search..." %}"
          name="q"
          data-bind:table-query-string
          value="{{ table.filterset.form.q.value|default:'' }}"

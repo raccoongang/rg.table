@@ -1,5 +1,6 @@
+{% load i18n %}
 <button type="button"
         class="btn btn-outline-secondary"
         data-on:click="@get('{{ request.path }}')">
-  Clear
+  {% trans "Clear" %}
 </button>

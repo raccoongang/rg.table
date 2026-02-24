@@ -1,7 +1,8 @@
+{% load i18n %}
 <div class="control has-icons-left">
   <input type="text"
          class="input"
-         placeholder="Search..."
+         placeholder="{% trans "Search..." %}"
          name="q"
          data-bind:table-query-string
          value="{{ table.filterset.form.q.value|default:'' }}"

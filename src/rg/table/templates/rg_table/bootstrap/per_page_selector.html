@@ -1,6 +1,7 @@
+{% load i18n %}
 {% if table.enable_per_page_selection and table.per_page_choices %}
 <div class="d-flex align-items-center gap-1 mt-2 justify-content-center">
-  <small class="text-muted me-1">Show:</small>
+  <small class="text-muted me-1">{% trans "Show:" %}</small>
   {% for choice in table.per_page_choices %}
   <form class="d-inline">
     {% csrf_token %}

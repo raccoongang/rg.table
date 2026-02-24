@@ -13,6 +13,7 @@ from django.core.paginator import EmptyPage
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.utils.translation import gettext, ngettext
 
 from .config import (
     ACTION_PARAM,
@@ -227,17 +228,25 @@ def table_render(
                                     else len(table.data)
                                 )
                                 msg = (
-                                    f"This will affect all"
-                                    f" {total} records."
-                                    f" {action.confirm}"
+                                    gettext(
+                                        "This will affect all"
+                                        " %(total)s records."
+                                    )
+                                    % {"total": total}
+                                    + " "
+                                    + action.confirm
                                 )
                             else:
                                 count = len(selected)
                                 msg = (
-                                    f"{count} record"
-                                    f"{'s' if count != 1 else ''}"
-                                    f" selected."
-                                    f" {action.confirm}"
+                                    ngettext(
+                                        "%(count)s record selected.",
+                                        "%(count)s records selected.",
+                                        count,
+                                    )
+                                    % {"count": count}
+                                    + " "
+                                    + action.confirm
                                 )
                             return _action_confirm_sse(
                                 request, table, action, selected,

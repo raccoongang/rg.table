@@ -1,17 +1,17 @@
-{% load django_tables2 %}
+{% load i18n %}{% load django_tables2 %}
 {# Bulma infinite scroll paginator - standard pagination + per_page control #}
 {% if table.page %}
   <div class="level mt-3">
     <div class="level-left">
       <div class="level-item">
         <span class="has-text-grey is-size-7">
-          Showing {{ table.page.start_index }}-{{ table.page.end_index }} of {{ table.paginator.count }} results
+          {% blocktrans with start=table.page.start_index end=table.page.end_index total=table.paginator.count %}Showing {{ start }}-{{ end }} of {{ total }} results{% endblocktrans %}
         </span>
       </div>
     </div>
     <div class="level-right">
       <div class="level-item">
-        <label class="label is-small mb-0 mr-2" for="per_page_input">Rows:</label>
+        <label class="label is-small mb-0 mr-2" for="per_page_input">{% trans "Rows:" %}</label>
       </div>
       <form>
         <div class="level-item">
@@ -31,15 +31,15 @@
   {% if table.paginator.num_pages > 1 %}
     <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
       {% if table.page.has_previous %}
-        <a class="pagination-previous" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.previous_page_number %}')">Previous</a>
+        <a class="pagination-previous" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.previous_page_number %}')">{% trans "Previous" %}</a>
       {% else %}
-        <a class="pagination-previous" disabled>Previous</a>
+        <a class="pagination-previous" disabled>{% trans "Previous" %}</a>
       {% endif %}
 
       {% if table.page.has_next %}
-        <a class="pagination-next" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.next_page_number %}')">Next</a>
+        <a class="pagination-next" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.next_page_number %}')">{% trans "Next" %}</a>
       {% else %}
-        <a class="pagination-next" disabled>Next</a>
+        <a class="pagination-next" disabled>{% trans "Next" %}</a>
       {% endif %}
 
       <ul class="pagination-list">
@@ -70,7 +70,7 @@
 
         {% if table.page.number < table.paginator.num_pages|add:"-1" %}
           {% if table.page.number < table.paginator.num_pages|add:"-2" %}
-            <li><span class="pagination-ellipsis">Loading...</span></li>
+            <li><span class="pagination-ellipsis">&hellip;</span></li>
           {% endif %}
           <li>
             <a class="pagination-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.paginator.num_pages %}')">{{ table.paginator.num_pages }}</a>

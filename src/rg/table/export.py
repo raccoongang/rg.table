@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from django.http import HttpResponse
+from django.utils.translation import gettext_lazy as _
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -133,7 +134,7 @@ class ExportMixin:
         export_actions: list[TableAction] = [
             TableAction(
                 "export_csv",
-                "Export CSV",
+                _("Export CSV"),
                 make_csv_export(),
                 requires_selection=False,
             ),
@@ -144,7 +145,7 @@ class ExportMixin:
             export_actions.append(
                 TableAction(
                     "export_xlsx",
-                    "Export XLSX",
+                    _("Export XLSX"),
                     make_xlsx_export(),
                     requires_selection=False,
                 ),

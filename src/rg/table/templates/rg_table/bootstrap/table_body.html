@@ -1,4 +1,4 @@
-{% load django_tables2 %}{% load table_tags %}
+{% load i18n %}{% load django_tables2 %}{% load table_tags %}
 {# Bootstrap 5 table body partial - pure table markup, no paginator #}
 <div class="table-responsive">
   <table class="table table-striped table-hover{% if table.attrs.class %} {{ table.attrs.class }}{% endif %}"
@@ -41,7 +41,8 @@
       {% empty %}
         <tr>
           <td colspan="{{ table.columns|length }}" class="text-center text-muted py-4">
-            {{ table.empty_text|default:"No data available" }}
+            {% trans "No data available" as no_data_default %}
+            {{ table.empty_text|default:no_data_default }}
           </td>
         </tr>
       {% endfor %}

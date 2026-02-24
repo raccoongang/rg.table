@@ -1,13 +1,13 @@
-{% load django_tables2 %}
+{% load i18n %}{% load django_tables2 %}
 {# Bootstrap infinite scroll paginator - standard pagination + per_page control #}
 {% if table.page %}
   <div class="d-flex justify-content-between align-items-center mt-3">
     <div class="text-muted small">
-      Showing {{ table.page.start_index }}-{{ table.page.end_index }} of {{ table.paginator.count }} results
+      {% blocktrans with start=table.page.start_index end=table.page.end_index total=table.paginator.count %}Showing {{ start }}-{{ end }} of {{ total }} results{% endblocktrans %}
     </div>
     <form>
       <div class="d-flex align-items-center gap-2">
-        <label class="form-label mb-0 small text-muted" for="per_page_input">Rows:</label>
+        <label class="form-label mb-0 small text-muted" for="per_page_input">{% trans "Rows:" %}</label>
         <input type="number"
                name="per_page"
                id="per_page_input"
@@ -25,32 +25,32 @@
       <ul class="pagination justify-content-center">
         {% if table.page.has_previous %}
           <li class="page-item">
-            <a class="page-link" data-on:click="@get('{% querystring table.prefixed_page_field=1 %}')">&laquo; First</a>
+            <a class="page-link" data-on:click="@get('{% querystring table.prefixed_page_field=1 %}')">&laquo; {% trans "First" %}</a>
           </li>
           <li class="page-item">
-            <a class="page-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.previous_page_number %}')">Previous</a>
+            <a class="page-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.previous_page_number %}')">{% trans "Previous" %}</a>
           </li>
         {% else %}
-          <li class="page-item disabled"><span class="page-link">&laquo; First</span></li>
-          <li class="page-item disabled"><span class="page-link">Previous</span></li>
+          <li class="page-item disabled"><span class="page-link">&laquo; {% trans "First" %}</span></li>
+          <li class="page-item disabled"><span class="page-link">{% trans "Previous" %}</span></li>
         {% endif %}
 
         <li class="page-item disabled">
           <span class="page-link">
-            Page {{ table.page.number }} of {{ table.paginator.num_pages }}
+            {% blocktrans with current=table.page.number total=table.paginator.num_pages %}Page {{ current }} of {{ total }}{% endblocktrans %}
           </span>
         </li>
 
         {% if table.page.has_next %}
           <li class="page-item">
-            <a class="page-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.next_page_number %}')">Next</a>
+            <a class="page-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.next_page_number %}')">{% trans "Next" %}</a>
           </li>
           <li class="page-item">
-            <a class="page-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.paginator.num_pages %}')">Last &raquo;</a>
+            <a class="page-link" data-on:click="@get('{% querystring table.prefixed_page_field=table.paginator.num_pages %}')">{% trans "Last" %} &raquo;</a>
           </li>
         {% else %}
-          <li class="page-item disabled"><span class="page-link">Next</span></li>
-          <li class="page-item disabled"><span class="page-link">Last &raquo;</span></li>
+          <li class="page-item disabled"><span class="page-link">{% trans "Next" %}</span></li>
+          <li class="page-item disabled"><span class="page-link">{% trans "Last" %} &raquo;</span></li>
         {% endif %}
       </ul>
     </nav>

@@ -1,16 +1,16 @@
-{% load django_tables2 %}
+{% load i18n %}{% load django_tables2 %}
 {% if table.page and table.paginator.num_pages > 1 %}
   <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
     {% if table.page.has_previous %}
-      <a class="pagination-previous" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.previous_page_number %}')">Previous</a>
+      <a class="pagination-previous" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.previous_page_number %}')">{% trans "Previous" %}</a>
     {% else %}
-      <a class="pagination-previous" disabled>Previous</a>
+      <a class="pagination-previous" disabled>{% trans "Previous" %}</a>
     {% endif %}
 
     {% if table.page.has_next %}
-      <a class="pagination-next" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.next_page_number %}')">Next</a>
+      <a class="pagination-next" data-on:click="@get('{% querystring table.prefixed_page_field=table.page.next_page_number %}')">{% trans "Next" %}</a>
     {% else %}
-      <a class="pagination-next" disabled>Next</a>
+      <a class="pagination-next" disabled>{% trans "Next" %}</a>
     {% endif %}
 
     <ul class="pagination-list">
