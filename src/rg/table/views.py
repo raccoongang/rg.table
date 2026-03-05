@@ -1,6 +1,7 @@
 """View mixins and classes for Table."""
 
 import base64
+import json
 from collections.abc import Generator
 from typing import Any
 
@@ -10,7 +11,7 @@ from datastar_py.django import (
 )
 from datastar_py.sse import DatastarEvent
 from django.core.paginator import EmptyPage
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, QueryDict
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils.translation import gettext, ngettext
@@ -51,6 +52,70 @@ def _repaginate(table: Any) -> None:
         table.page = table.paginator.page(max(num_pages, 1))
 
 
+def _parse_datastar_filter_signals(
+    request: HttpRequest, filter_names: set[str]
+) -> dict[str, str]:
+    """Extract validated filter params from the ``datastar`` query signal.
+
+    Parses the JSON ``datastar`` query-string parameter sent by Datastar
+    ``@get`` requests.  Only keys that appear in *filter_names* are kept,
+    and only string values are accepted (no nested objects/arrays).
+
+    Returns a dict of ``{param_name: value}`` ready to merge into a
+    ``QueryDict``.
+    """
+    raw = request.GET.get("datastar")
+    if not raw:
+        return {}
+    try:
+        signals = json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return {}
+    if not isinstance(signals, dict):
+        return {}
+    result: dict[str, str] = {}
+    for key, value in signals.items():
+        if key not in filter_names:
+            continue
+        # Accept only scalar string values (or numbers cast to str)
+        if isinstance(value, str):
+            result[key] = value
+        elif isinstance(value, (int, float)) and not isinstance(value, bool):
+            result[key] = str(value)
+    return result
+
+
+def merge_datastar_filter_params(
+    request: HttpRequest, filterset_class: type
+) -> QueryDict:
+    """Merge Datastar signal filter values into ``request.GET``.
+
+    When a Datastar ``@get`` sends filter values as signals (inside the
+    ``datastar`` JSON query parameter) rather than as top-level GET params,
+    the Django filterset won't see them.  This helper promotes recognised
+    filter params from the signal into a new ``QueryDict`` suitable for
+    passing to a ``FilterSet`` constructor.
+
+    Top-level GET params take precedence — signal values are only added
+    for params not already present.
+
+    Usage::
+
+        data = merge_datastar_filter_params(request, MyFilterSet)
+        filterset = MyFilterSet(data, queryset=qs)
+    """
+    filter_names = set(filterset_class.base_filters.keys())
+    signal_params = _parse_datastar_filter_signals(request, filter_names)
+    if not signal_params:
+        return request.GET
+
+    merged = request.GET.copy()
+    for key, value in signal_params.items():
+        if key not in merged:
+            merged[key] = value
+    return merged
+
+
 def _get_template_kit(table: Any) -> str:
     """Extract template kit name from table's template_name."""
     # template_name is like "rg_table/bootstrap/table.html"
@@ -61,8 +126,26 @@ def _get_template_kit(table: Any) -> str:
 
 
 def _clean_query_params(request: HttpRequest, table: Any) -> str:
-    """Build clean URL with current page, stripping internal params."""
+    """Build clean URL with current page, stripping internal params.
+
+    Filter values that arrived inside the ``datastar`` JSON signal are
+    promoted to top-level query params so the URL is bookmarkable.
+    """
+    # Promote filter signals before stripping the datastar param
+    filterset = getattr(table, "filterset", None)
+    if filterset is not None:
+        filter_names = set(filterset.filters.keys())
+        signal_params = _parse_datastar_filter_signals(request, filter_names)
+    else:
+        signal_params = {}
+
     query_params = request.GET.copy()
+
+    # Merge signal filter values (only if not already present as GET params)
+    for key, value in signal_params.items():
+        if key not in query_params:
+            query_params[key] = value
+
     page = getattr(table, "page", None)
     if page is not None:
         query_params["page"] = page.number

@@ -12,7 +12,6 @@
   <select name="{{ filter_name }}"
           data-bind="{{ filter_name }}"
           data-on:change="@get('{{ request.path }}', {contentType: 'form'})">
-    <option value="">{{ filter_field.label }}</option>
     {% for choice in filter_field.field.choices %}
       <option value="{{ choice.0 }}"{% if filter_field.value == choice.0|stringformat:'s' %} selected{% endif %}>
         {{ choice.1 }}

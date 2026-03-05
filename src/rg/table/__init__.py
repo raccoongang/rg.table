@@ -9,7 +9,7 @@ __version__ = "0.1.0"
 from .columns import DynamicColumn
 from .config import RequestConfig
 from .tables import Table, TableMeta
-from .views import table_render
+from .views import merge_datastar_filter_params, table_render
 
 if TYPE_CHECKING:
     from .models import TableProfile
@@ -28,6 +28,7 @@ __all__ = [
     "TableListView",
     "DynamicColumn",
     "RequestConfig",
+    "merge_datastar_filter_params",
     "table_render",
     "__version__",
 ]

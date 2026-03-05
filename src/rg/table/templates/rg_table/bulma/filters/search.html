@@ -7,7 +7,7 @@
          data-bind:table-query-string
          value="{{ table.filterset.form.q.value|default:'' }}"
          data-indicator:fetching
-         data-on:input__debounce.500ms="@get('?q=' + $tableQueryString)">
+         data-on:input__debounce.500ms="@get('{{ request.path }}', {contentType: 'form'})">
   <span class="icon is-left">
     {# Search icon - hidden when loading #}
     <svg data-show="!$fetching" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">

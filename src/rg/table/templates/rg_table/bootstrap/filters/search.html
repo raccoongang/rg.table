@@ -17,5 +17,5 @@
          data-bind:table-query-string
          value="{{ table.filterset.form.q.value|default:'' }}"
          data-indicator:fetching
-         data-on:input__debounce.500ms="@get('?q=' + $tableQueryString)">
+         data-on:input__debounce.500ms="@get('{{ request.path }}', {contentType: 'form'})">
 </div>
