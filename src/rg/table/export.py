@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -45,6 +45,15 @@ def _get_row_id(table: Any, row: Any) -> Any:
     return record[field]
 
 
+def _export_columns(table: Any) -> list[Any]:
+    """Return visible columns that are not marked ``exclude_from_export``."""
+    return [
+        col
+        for col in table.columns
+        if not getattr(col.column, "exclude_from_export", False)
+    ]
+
+
 def make_csv_export(filename: str = "export.csv") -> Callable[..., HttpResponse]:
     """Create a CSV export action handler using visible table columns.
 
@@ -57,12 +66,13 @@ def make_csv_export(filename: str = "export.csv") -> Callable[..., HttpResponse]
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         writer = csv.writer(response)
-        writer.writerow([col.header for col in table.columns])
+        columns = _export_columns(table)
+        writer.writerow([col.header for col in columns])
         selected_set = set(selected_pks)
         for row in table.rows:
             rid = str(_get_row_id(table, row))
             if not selected_set or rid in selected_set:
-                writer.writerow([row.get_cell_value(col.name) for col in table.columns])
+                writer.writerow([row.get_cell_value(col.name) for col in columns])
         return response
 
     return handler
@@ -85,7 +95,8 @@ def make_xlsx_export(filename: str = "export.xlsx") -> Callable[..., HttpRespons
         ws = wb.add_worksheet("Export")
         bold = wb.add_format({"bold": True})
 
-        headers = [col.header for col in table.columns]
+        columns = _export_columns(table)
+        headers = [str(col.header) for col in columns]
         for col_idx, header in enumerate(headers):
             ws.write(0, col_idx, header, bold)
 
@@ -94,8 +105,11 @@ def make_xlsx_export(filename: str = "export.xlsx") -> Callable[..., HttpRespons
         for row in table.rows:
             rid = str(_get_row_id(table, row))
             if not selected_set or rid in selected_set:
-                for col_idx, col in enumerate(table.columns):
-                    ws.write(row_idx, col_idx, row.get_cell_value(col.name))
+                for col_idx, col in enumerate(columns):
+                    value = row.get_cell_value(col.name)
+                    if not isinstance(value, (str, int, float, bool, type(None))):
+                        value = str(value)
+                    ws.write(row_idx, col_idx, value)
                 row_idx += 1
 
         for col_idx, header in enumerate(headers):

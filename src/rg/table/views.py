@@ -86,7 +86,7 @@ def _parse_datastar_filter_signals(
 
 
 def merge_datastar_filter_params(
-    request: HttpRequest, filterset_class: type
+    request: HttpRequest, filterset_class: Any
 ) -> QueryDict:
     """Merge Datastar signal filter values into ``request.GET``.
 
