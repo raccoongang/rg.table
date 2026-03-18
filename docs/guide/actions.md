@@ -155,6 +155,37 @@ make_csv_export(filename="books.csv")
 make_xlsx_export(filename="books.xlsx")
 ```
 
+## Extra Export Fields
+
+Use `extra_fields` to include fields in the export that are **not shown in the HTML table**. This is useful for sensitive data (e.g. passwords) or internal fields that should only appear in downloads.
+
+`extra_fields` is a list of `(header, attr_name)` tuples. For each row, the value is read from `row.record` and appended after the regular table columns.
+
+```python
+from django.utils.translation import gettext_lazy as _
+from rg.table import TableAction, make_csv_export, make_xlsx_export
+
+# Static extra fields
+TableAction(
+    "export_csv", "Export CSV",
+    make_csv_export("codes.csv", extra_fields=[(_("Password"), "password")]),
+    requires_selection=False,
+)
+
+# Conditional extra fields
+extra_fields = []
+if passwords_available:
+    extra_fields.append((_("Password"), "password"))
+
+TableAction(
+    "export_csv", "Export CSV",
+    make_csv_export("codes.csv", extra_fields=extra_fields or None),
+    requires_selection=False,
+)
+```
+
+If the attribute is missing on a record, an empty string is used as the value.
+
 ## Writing Custom Handlers
 
 A handler receives `(request, table, selected_pks)` where `selected_pks` is a `list[str]` of row IDs from the checked checkboxes.

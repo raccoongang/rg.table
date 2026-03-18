@@ -635,6 +635,49 @@ class TestMakeCsvExport:
         rows = list(reader)
         assert len(rows) == 3  # header + 2 selected
 
+    def test_csv_export_extra_fields(self, rf):
+        """Extra fields are appended as additional columns."""
+        data = [
+            {"id": 1, "name": "Alice", "country": "USA", "secret": "abc"},
+            {"id": 2, "name": "Bob", "country": "UK", "secret": "xyz"},
+        ]
+        handler = make_csv_export("test.csv", extra_fields=[("Secret", "secret")])
+        request = _make_request(rf)
+        table = ActionTable(data, name="test")
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = handler(request, table, [])
+        content = response.content.decode()
+        reader = csv.reader(io.StringIO(content))
+        rows = list(reader)
+        assert rows[0] == ["Id", "Name", "Country", "Secret"]
+        assert rows[1][-1] == "abc"
+        assert rows[2][-1] == "xyz"
+
+    def test_csv_export_extra_fields_missing_attr(self, rf):
+        """Missing attr on record produces empty string."""
+        handler = make_csv_export("test.csv", extra_fields=[("Missing", "nope")])
+        request = _make_request(rf)
+        table = ActionTable(SAMPLE_DATA, name="test")
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = handler(request, table, [])
+        content = response.content.decode()
+        reader = csv.reader(io.StringIO(content))
+        rows = list(reader)
+        assert rows[0][-1] == "Missing"
+        assert rows[1][-1] == ""
+
+    def test_csv_export_no_extra_fields_unchanged(self, rf):
+        """No extra_fields = identical behavior to before."""
+        handler = make_csv_export("test.csv")
+        request = _make_request(rf)
+        table = ActionTable(SAMPLE_DATA, name="test")
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = handler(request, table, [])
+        content = response.content.decode()
+        reader = csv.reader(io.StringIO(content))
+        rows = list(reader)
+        assert rows[0] == ["Id", "Name", "Country"]
+
 
 # --- XLSX export ---
 
@@ -661,6 +704,18 @@ class TestMakeXlsxExport:
         table = ActionTable(SAMPLE_DATA, name="test")
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
         response = handler(request, table, ["2"])
+        assert len(response.content) > 0
+
+    def test_xlsx_export_extra_fields(self, rf):
+        pytest.importorskip("xlsxwriter")
+        data = [
+            {"id": 1, "name": "Alice", "country": "USA", "secret": "abc"},
+        ]
+        handler = make_xlsx_export("test.xlsx", extra_fields=[("Secret", "secret")])
+        request = _make_request(rf)
+        table = ActionTable(data, name="test")
+        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        response = handler(request, table, [])
         assert len(response.content) > 0
 
 

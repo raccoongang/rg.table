@@ -54,10 +54,27 @@ def _export_columns(table: Any) -> list[Any]:
     ]
 
 
-def make_csv_export(filename: str = "export.csv") -> Callable[..., HttpResponse]:
+def _record_attr(record: Any, attr: str, default: Any = "") -> Any:
+    """Read *attr* from a record (model instance or dict)."""
+    if hasattr(record, attr):
+        return getattr(record, attr)
+    try:
+        return record[attr]
+    except (KeyError, TypeError):
+        return default
+
+
+def make_csv_export(
+    filename: str = "export.csv",
+    extra_fields: list[tuple[str, str]] | None = None,
+) -> Callable[..., HttpResponse]:
     """Create a CSV export action handler using visible table columns.
 
     If *selected_pks* is empty the handler exports **all** rows.
+
+    *extra_fields* is an optional list of ``(header, attr_name)`` tuples.
+    For each row the value is read via ``getattr(row.record, attr_name, "")``.
+    Extra fields are appended after the regular table columns.
     """
 
     def handler(
@@ -67,22 +84,35 @@ def make_csv_export(filename: str = "export.csv") -> Callable[..., HttpResponse]
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         writer = csv.writer(response)
         columns = _export_columns(table)
-        writer.writerow([col.header for col in columns])
+        headers = [col.header for col in columns]
+        extras = extra_fields or []
+        headers.extend(str(hdr) for hdr, _attr in extras)
+        writer.writerow(headers)
         selected_set = set(selected_pks)
         for row in table.rows:
             rid = str(_get_row_id(table, row))
             if not selected_set or rid in selected_set:
-                writer.writerow([row.get_cell_value(col.name) for col in columns])
+                values = [row.get_cell_value(col.name) for col in columns]
+                for _, attr in extras:
+                    values.append(_record_attr(row.record, attr))
+                writer.writerow(values)
         return response
 
     return handler
 
 
-def make_xlsx_export(filename: str = "export.xlsx") -> Callable[..., HttpResponse]:
+def make_xlsx_export(
+    filename: str = "export.xlsx",
+    extra_fields: list[tuple[str, str]] | None = None,
+) -> Callable[..., HttpResponse]:
     """Create an XLSX export action handler using visible table columns.
 
     Requires the ``xlsxwriter`` package.  If *selected_pks* is empty the
     handler exports **all** rows.
+
+    *extra_fields* is an optional list of ``(header, attr_name)`` tuples.
+    For each row the value is read via ``getattr(row.record, attr_name, "")``.
+    Extra fields are appended after the regular table columns.
     """
 
     def handler(
@@ -97,6 +127,8 @@ def make_xlsx_export(filename: str = "export.xlsx") -> Callable[..., HttpRespons
 
         columns = _export_columns(table)
         headers = [str(col.header) for col in columns]
+        extras = extra_fields or []
+        headers.extend(str(hdr) for hdr, _attr in extras)
         for col_idx, header in enumerate(headers):
             ws.write(0, col_idx, header, bold)
 
@@ -110,6 +142,12 @@ def make_xlsx_export(filename: str = "export.xlsx") -> Callable[..., HttpRespons
                     if not isinstance(value, (str, int, float, bool, type(None))):
                         value = str(value)
                     ws.write(row_idx, col_idx, value)
+                col_offset = len(columns)
+                for extra_idx, (_, attr) in enumerate(extras):
+                    value = _record_attr(row.record, attr)
+                    if not isinstance(value, (str, int, float, bool, type(None))):
+                        value = str(value)
+                    ws.write(row_idx, col_offset + extra_idx, value)
                 row_idx += 1
 
         for col_idx, header in enumerate(headers):
